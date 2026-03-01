@@ -51,14 +51,17 @@ pnpm start:cleanup
 ## 其他电脑安装与更新
 
 ```bash
-# 安装本仓库技能
-npx skills add snailuu/skill --skill git-exclude
-npx skills add snailuu/skill --skill code-review-expert
-npx skills add snailuu/skill --skill git-commit-gen
+# 交互式选择要安装的技能
+pnpx skills add snailuu/skill
+
+# 直接安装指定技能
+pnpx skills add snailuu/skill --skill git-exclude
+pnpx skills add snailuu/skill --skill code-review-expert
+pnpx skills add snailuu/skill --skill git-commit-gen
 
 # 检查并更新已安装技能
-npx skills check
-npx skills update
+pnpx skills check
+pnpx skills update
 ```
 
 ## Vendored Skills（外部来源）
