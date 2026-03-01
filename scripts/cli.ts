@@ -232,10 +232,10 @@ function printHelp(): void {
   console.log(`Skills Manager
 
 用法：
-  pnpm start init
-  pnpm start sync
-  pnpm start check
-  pnpm start cleanup
+  pnpm start:init
+  tsx scripts/cli.ts sync
+  pnpm start:check
+  pnpm start:cleanup
 `)
 }
 

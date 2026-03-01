@@ -16,13 +16,13 @@ export const submodules: Record<string, string> = {
  * 外部技能来源：直接同步已有 skills
  */
 export const vendors: Record<string, VendorSkillMeta> = {
-  // 示例：
-  // 'vueuse': {
-  //   source: 'https://github.com/vueuse/skills',
-  //   skills: {
-  //     'vueuse-functions': 'vueuse-functions',
-  //   },
-  // },
+  antfu: {
+    official: true,
+    source: 'https://github.com/antfu/skills',
+    // 当前仅作为外部技能来源索引，不同步到本仓库 skills/
+    // 如需二次分发，可按 sourceSkillName -> outputSkillName 增加映射后执行 start:sync
+    skills: {},
+  },
 }
 
 /**
