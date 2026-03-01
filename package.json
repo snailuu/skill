@@ -1,0 +1,23 @@
+{
+  "name": "snailuu-skills",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "scripts": {
+    "start": "tsx scripts/cli.ts",
+    "start:init": "tsx scripts/cli.ts init",
+    "start:sync": "tsx scripts/cli.ts sync",
+    "start:check": "tsx scripts/cli.ts check",
+    "start:cleanup": "tsx scripts/cli.ts cleanup",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.15.0",
+    "@types/node": "^22.13.10",
+    "eslint": "^9.22.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}
