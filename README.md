@@ -4,6 +4,8 @@
 
 当前已包含手写技能：
 
+- `code-review-expert`
+- `git-commit-gen`
 - `git-exclude`
 
 当前已接入外部技能来源：
@@ -51,6 +53,8 @@ pnpm start:cleanup
 ```bash
 # 安装本仓库技能
 npx skills add snailuu/skill --skill git-exclude
+npx skills add snailuu/skill --skill code-review-expert
+npx skills add snailuu/skill --skill git-commit-gen
 
 # 检查并更新已安装技能
 npx skills check

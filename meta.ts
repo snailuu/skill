@@ -29,5 +29,7 @@ export const vendors: Record<string, VendorSkillMeta> = {
  * 本仓库手写技能
  */
 export const manual = [
+  'code-review-expert',
+  'git-commit-gen',
   'git-exclude',
 ] as const
