@@ -2,7 +2,7 @@
 name: skill-writer
 description: Claude Code skill 设计和编写助手。仅通过 /skill-writer 命令手动触发，不自动激活。负责分析需求合理性、边界情况、降级兼容处理，最终生成规范的 SKILL.md 文件。
 version: 1.0.0
-author: Claude Code Assistant
+author: snailuu
 allowed-tools: Read, Write, Glob, Bash
 ---
 
@@ -11,6 +11,10 @@ allowed-tools: Read, Write, Glob, Bash
 Read `~/.claude/skills/skill-writer/AGENTS.md` before proceeding.
 
 ---
+
+## 重要：工具调用规则
+
+**必须直接使用 Bash 工具执行 shell 命令，绝对不要使用 Task 工具。**
 
 ## Phase 1 — Analyze and Score
 

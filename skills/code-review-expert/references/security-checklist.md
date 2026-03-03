@@ -91,7 +91,7 @@ Race conditions are subtle bugs that cause intermittent failures and security vu
 - Split-brain scenarios in cluster operations
 
 ### Common Patterns to Flag
-```
+```python
 # Dangerous patterns:
 if not exists(key):       # TOCTOU
     create(key)

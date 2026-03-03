@@ -1,6 +1,9 @@
 ---
 name: code-review-expert
-description: "Expert code review of current git changes with a senior engineer lens. Detects SOLID violations, security risks, and proposes actionable improvements."
+description: "Expert code review with a senior engineer lens. 当用户说\"代码审查\"、\"review 代码\"、\"code review\"、\"审查变更\"、\"检查代码质量\"时触发。不适用于：编写新代码、修复 bug、重构等开发操作。"
+version: 1.0.0
+author: snailuu
+allowed-tools: Bash, Read, Grep
 ---
 
 # Code Review Expert
@@ -23,7 +26,7 @@ Perform a structured review of the current git changes with focus on SOLID, arch
 ### 1) Preflight context
 
 - Use `git status -sb`, `git diff --stat`, and `git diff` to scope changes.
-- If needed, use `rg` or `grep` to find related modules, usages, and contracts.
+- If needed, use the Grep tool to find related modules, usages, and contracts.
 - Identify entry points, ownership boundaries, and critical paths (auth, payments, data writes, network).
 
 **Edge cases:**

@@ -1,6 +1,6 @@
 # Skill Writer Rules
 
-**Version 1.1.0** — Claude Code Assistant
+**Version 1.1.0** — snailuu
 
 > Load this document in full when executing the skill-writer workflow.
 

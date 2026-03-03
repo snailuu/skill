@@ -34,7 +34,7 @@ grep -q "^allowed-tools:" "$SKILL_FILE" \
   || warn "no allowed-tools (ok if skill uses no tools)"
 
 # Description length
-DESC=$(grep "^description:" "$SKILL_FILE" | sed 's/^description: *//')
+DESC=$(grep "^description:" "$SKILL_FILE" | head -1 | sed 's/^description: *//; s/^"//; s/"$//')
 DESC_LEN=${#DESC}
 if [[ $DESC_LEN -lt 30 ]]; then
   fail "description too short (${DESC_LEN} chars) — add trigger keywords"
@@ -77,9 +77,16 @@ fi
 echo ""
 echo "[ Anti-patterns ]"
 
-# Task tool misuse
-if grep -qE 'subagent_type.*[Bb]ash|Task.*shell|shell.*Task' "$SKILL_FILE"; then
-  fail "Task tool used for shell — use Bash tool directly"
+# Task tool misuse (exclude negation patterns like "不要使用 Task")
+TASK_LINES=$(grep -nE 'subagent_type.*[Bb]ash|Task.*shell|shell.*Task' "$SKILL_FILE" || true)
+if [[ -n "$TASK_LINES" ]]; then
+  # Filter out lines that are negation/warning patterns
+  REAL_MISUSE=$(echo "$TASK_LINES" | grep -vE '不要使用|绝对不要|不要.*Task|never.*Task|Never.*Task|do not.*Task|Do not.*Task' || true)
+  if [[ -n "$REAL_MISUSE" ]]; then
+    fail "Task tool used for shell — use Bash tool directly"
+  else
+    pass "no Task tool shell misuse (negation pattern detected)"
+  fi
 else
   pass "no Task tool shell misuse"
 fi
