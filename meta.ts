@@ -32,4 +32,5 @@ export const manual = [
   'code-review-expert',
   'git-commit-gen',
   'git-exclude',
+  'smart-plan',
 ] as const
