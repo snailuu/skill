@@ -7,6 +7,10 @@
 - `code-review-expert`
 - `git-commit-gen`
 - `git-exclude`
+- `pr-review`
+- `skill-writer`
+- `smart-plan`
+- `writing-changelogs`
 
 当前已接入外部技能来源：
 
@@ -58,6 +62,10 @@ pnpx skills add snailuu/skill
 pnpx skills add snailuu/skill --skill git-exclude
 pnpx skills add snailuu/skill --skill code-review-expert
 pnpx skills add snailuu/skill --skill git-commit-gen
+pnpx skills add snailuu/skill --skill pr-review
+pnpx skills add snailuu/skill --skill skill-writer
+pnpx skills add snailuu/skill --skill smart-plan
+pnpx skills add snailuu/skill --skill writing-changelogs
 
 # 检查并更新已安装技能
 pnpx skills check
