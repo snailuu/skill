@@ -61,6 +61,14 @@ pnpm start:cleanup
 - `Submodule Sources / Source Repos`：来自 `meta.ts` 的 `submodules`
 - `Consistency Checks`：检查 `skills/`、`meta.ts`、`README.md` 是否同步
 
+当前 `Manual Skills` 会基于 `name`、标题和 `description` 做规则分类与 tags 生成，并按分类分组展示。
+后续如果要接入 AI，建议只用于：
+
+- 润色每个 skill 的一句话摘要
+- 在规则无法明确命中时兜底做分类判断
+
+不要让 AI 负责事实提取或目录一致性判断。
+
 本地预览命令：
 
 ```bash

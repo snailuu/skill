@@ -4,6 +4,8 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  buildSkillTags,
+  classifySkill,
   detectRecentChanges,
   parseReadmeManualSkills,
   parseSkillFrontmatter,
@@ -54,6 +56,34 @@ test('detectRecentChanges 能区分新增和更新的 manual skill', () => {
   })
 })
 
+test('classifySkill 能为常见 skill 分配稳定分类', () => {
+  assert.equal(classifySkill({
+    name: 'git-commit-gen',
+    title: 'Git Commit 信息生成技能',
+    description: '根据 git status 和 git diff 自动生成 commit message',
+  }), 'git')
+
+  assert.equal(classifySkill({
+    name: 'pr-review',
+    title: 'PR/MR 评论查看与建议技能',
+    description: '查看 PR/MR 评论并给出解决建议',
+  }), 'review')
+
+  assert.equal(classifySkill({
+    name: 'writing-changelogs',
+    title: '编写 CHANGELOG 技能',
+    description: 'Use when 需要根据 git 历史生成或更新 CHANGELOG.md',
+  }), 'release')
+})
+
+test('buildSkillTags 能基于 skill 信息生成标签', () => {
+  assert.deepEqual(buildSkillTags({
+    name: 'pr-review',
+    title: 'PR/MR 评论查看与建议技能',
+    description: '查看 PR/MR 评论并给出解决建议，支持 GitHub 和 GitLab',
+  }), ['git', 'github', 'gitlab', 'pr', 'review'])
+})
+
 test('parseReadmeManualSkills 能解析 README 中的手写技能列表', () => {
   const skills = parseReadmeManualSkills(`
 当前已包含手写技能：
@@ -81,11 +111,13 @@ test('renderRegistryMarkdown 会输出固定结构', () => {
       submoduleCount: 1,
     },
     manualSkills: [{
+      category: 'release',
       name: 'writing-changelogs',
       title: '编写 CHANGELOG 技能',
       description: 'Use when 需要根据 git 历史生成或更新 CHANGELOG.md',
       path: 'skills/writing-changelogs',
       hasReferences: true,
+      tags: ['release', 'changelog', 'writing'],
     }],
     vendors: [{
       name: 'antfu',
@@ -116,9 +148,11 @@ test('renderRegistryMarkdown 会输出固定结构', () => {
 
   assert.match(markdown, /^# Skills Registry/m)
   assert.match(markdown, /^## Manual Skills/m)
+  assert.match(markdown, /^### Release/m)
   assert.match(markdown, /^## Vendor Sources/m)
   assert.match(markdown, /^## Submodule Sources \/ Source Repos/m)
   assert.match(markdown, /^## Recent Changes/m)
   assert.match(markdown, /^## Consistency Checks/m)
   assert.match(markdown, /writing-changelogs/)
+  assert.match(markdown, /标签：`release`、`changelog`、`writing`/)
 })

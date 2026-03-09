@@ -13,10 +13,12 @@ export interface ParsedSkillFrontmatter {
 }
 
 export interface ManualSkillSummary {
+  category: SkillCategory
   description: string
   hasReferences: boolean
   name: string
   path: string
+  tags: string[]
   title: string
 }
 
@@ -68,6 +70,16 @@ export interface DiffEntry {
   status: string
 }
 
+export type SkillCategory
+  = 'git'
+    | 'planning'
+    | 'release'
+    | 'research'
+    | 'review'
+    | 'utility'
+    | 'workflow'
+    | 'writing'
+
 interface CliOptions {
   base?: string
   head?: string
@@ -80,6 +92,87 @@ function readFile(path: string): string {
 
 function formatTimestamp(iso: string): string {
   return iso.replace('T', ' ').replace(/\.\d{3}Z$/, ' UTC')
+}
+
+function normalizeSkillText(input: { description: string, name: string, title: string }): string {
+  return `${input.name} ${input.title} ${input.description}`.toLowerCase()
+}
+
+function includesAny(text: string, keywords: string[]): boolean {
+  return keywords.some(keyword => text.includes(keyword))
+}
+
+const categoryOrder: SkillCategory[] = [
+  'git',
+  'review',
+  'planning',
+  'writing',
+  'workflow',
+  'release',
+  'research',
+  'utility',
+]
+
+const categoryLabels: Record<SkillCategory, string> = {
+  git: 'Git',
+  review: 'Review',
+  planning: 'Planning',
+  writing: 'Writing',
+  workflow: 'Workflow',
+  release: 'Release',
+  research: 'Research',
+  utility: 'Utility',
+}
+
+export function classifySkill(input: { description: string, name: string, title: string }): SkillCategory {
+  const text = normalizeSkillText(input)
+
+  if (includesAny(text, ['changelog', 'release', '发版']))
+    return 'release'
+  if (includesAny(text, ['workflow', 'agent', 'dispatch', 'handoff', '编排']))
+    return 'workflow'
+  if (includesAny(text, ['review', '审查', 'pr', 'mr', 'merge request']))
+    return 'review'
+  if (includesAny(text, ['git', 'commit', 'exclude', 'branch']))
+    return 'git'
+  if (includesAny(text, ['plan', '规划', '计划', 'roadmap']))
+    return 'planning'
+  if (includesAny(text, ['writer', '写作', 'skill.md', '文案']))
+    return 'writing'
+  if (includesAny(text, ['research', '搜索', '调研']))
+    return 'research'
+
+  return 'utility'
+}
+
+export function buildSkillTags(input: { description: string, name: string, title: string }): string[] {
+  const text = normalizeSkillText(input)
+  const tags = new Set<string>()
+
+  if (includesAny(text, ['git', 'commit', 'exclude', 'branch']))
+    tags.add('git')
+  if (includesAny(text, ['github', 'gh']))
+    tags.add('github')
+  if (includesAny(text, ['gitlab', 'glab']))
+    tags.add('gitlab')
+  if (includesAny(text, ['pr', 'pull request']))
+    tags.add('pr')
+  if (includesAny(text, ['review', '审查', 'mr', 'merge request']))
+    tags.add('review')
+  if (includesAny(text, ['plan', '规划', '计划']))
+    tags.add('planning')
+  if (includesAny(text, ['workflow', 'agent', 'dispatch', 'handoff', '编排']))
+    tags.add('workflow')
+  if (includesAny(text, ['writer', '写作', '文案']))
+    tags.add('writing')
+  if (includesAny(text, ['changelog']))
+    tags.add('changelog')
+  if (includesAny(text, ['release', '发版']))
+    tags.add('release')
+  if (includesAny(text, ['research', '搜索', '调研']))
+    tags.add('research')
+
+  return [...tags].sort()
 }
 
 function extractTitle(content: string): string {
@@ -141,13 +234,17 @@ function getManualSkillSummary(name: string): ManualSkillSummary {
   const skillFile = join(skillPath, 'SKILL.md')
   const content = readFile(skillFile)
   const { description } = parseSkillFrontmatter(content)
+  const title = extractTitle(content)
+  const input = { name, title, description }
 
   return {
+    category: classifySkill(input),
     name,
-    title: extractTitle(content),
+    title,
     description,
     path: `skills/${name}`,
     hasReferences: existsSync(join(skillPath, 'references')),
+    tags: buildSkillTags(input),
   }
 }
 
@@ -329,17 +426,40 @@ function renderList(items: string[], emptyText: string): string {
   return items.map(item => `- \`${item}\``).join('\n')
 }
 
+function renderTagLine(tags: string[]): string {
+  if (!tags.length)
+    return '- 标签：无'
+
+  return `- 标签：${tags.map(tag => `\`${tag}\``).join('、')}`
+}
+
 function renderManualSkills(skills: ManualSkillSummary[]): string {
   if (!skills.length)
     return '- 暂无 manual skills。'
 
-  return skills.map(skill => [
-    `### ${skill.name}`,
-    `- 标题：${skill.title}`,
-    `- 使用场景：${skill.description}`,
-    `- 路径：\`${skill.path}\``,
-    `- 参考资料：${skill.hasReferences ? '有 `references/`' : '无'}`,
-  ].join('\n')).join('\n\n')
+  const groups = new Map<SkillCategory, ManualSkillSummary[]>()
+
+  for (const skill of skills) {
+    const current = groups.get(skill.category) ?? []
+    current.push(skill)
+    groups.set(skill.category, current)
+  }
+
+  return categoryOrder
+    .filter(category => groups.has(category))
+    .map((category) => {
+      const items = groups.get(category)!.map(skill => [
+        `#### ${skill.name}`,
+        `- 标题：${skill.title}`,
+        `- 使用场景：${skill.description}`,
+        `- 路径：\`${skill.path}\``,
+        renderTagLine(skill.tags),
+        `- 参考资料：${skill.hasReferences ? '有 `references/`' : '无'}`,
+      ].join('\n')).join('\n\n')
+
+      return [`### ${categoryLabels[category]}`, items].join('\n\n')
+    })
+    .join('\n\n')
 }
 
 function renderVendors(items: VendorSummary[]): string {
