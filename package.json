@@ -8,6 +8,8 @@
     "start:init": "tsx scripts/cli.ts init",
     "start:check": "tsx scripts/cli.ts check",
     "start:cleanup": "tsx scripts/cli.ts cleanup",
+    "registry:build": "node --import tsx scripts/build-skill-registry.ts",
+    "registry:test": "node --import tsx --test scripts/build-skill-registry.test.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit"

@@ -52,6 +52,34 @@ pnpm start:cleanup
 
 > 说明：当前不把外部仓库内容同步到本仓库 `skills/`，`vendor` 仅做来源索引。
 
+## Skills Registry Issue
+
+仓库内置了一个 GitHub Action，会在主分支相关文件变更后全量重写固定的 pinned issue，用于展示当前 skills registry：
+
+- `Manual Skills`：来自 `meta.ts` 的 `manual` 与 `skills/<name>/SKILL.md`
+- `Vendor Sources`：来自 `meta.ts` 的 `vendors`
+- `Submodule Sources / Source Repos`：来自 `meta.ts` 的 `submodules`
+- `Consistency Checks`：检查 `skills/`、`meta.ts`、`README.md` 是否同步
+
+本地预览命令：
+
+```bash
+pnpm registry:build
+pnpm registry:test
+```
+
+启用该 workflow 前，请先在 GitHub 仓库变量中配置：
+
+```text
+PINNED_ISSUE_NUMBER=<固定 issue 编号>
+```
+
+对应 workflow 文件：
+
+```text
+.github/workflows/update-pinned-registry.yml
+```
+
 ## 其他电脑安装与更新
 
 ```bash
