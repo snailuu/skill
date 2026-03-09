@@ -10,6 +10,9 @@ on:
       - README.md
       - vendor/**
       - sources/**
+      - scripts/**
+      - package.json
+      - .github/workflows/update-pinned-registry.yml
   workflow_dispatch:
     inputs:
       issue_number:
