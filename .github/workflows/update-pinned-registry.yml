@@ -30,7 +30,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ISSUE_NUMBER: ${{ github.event.inputs.issue_number || vars.PINNED_ISSUE_NUMBER }}
-      REGISTRY_FILE: ${{ runner.temp }}/skills-registry.md
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -59,10 +58,13 @@ jobs:
           fi
 
       - name: Build registry markdown
+        env:
+          REGISTRY_FILE: ${{ runner.temp }}/skills-registry.md
         run: |
           pnpm registry:build -- --base "${{ github.event.before }}" --head "${{ github.sha }}" --output "$REGISTRY_FILE"
 
       - name: Update pinned issue body
         env:
           GH_TOKEN: ${{ github.token }}
+          REGISTRY_FILE: ${{ runner.temp }}/skills-registry.md
         run: gh issue edit "$ISSUE_NUMBER" --body-file "$REGISTRY_FILE"
