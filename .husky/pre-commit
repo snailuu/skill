@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# 检查暂存区是否有 skills/ 或 meta.ts 相关变更
+CHANGED=$(git diff --cached --name-only | grep -E '^(skills/|meta\.ts|scripts/build-skill-registry\.ts)' || true)
+
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+echo "检测到 skills 相关变更，生成 .preview/ ..."
+pnpm registry:preview --summarize
+
+# 将生成的文件加入暂存区，随本次 commit 一起提交
+git add .preview/
+echo ".preview/ 已更新"

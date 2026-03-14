@@ -12,14 +12,18 @@
     "registry:build": "node --import tsx scripts/build-skill-registry.ts",
     "registry:preview": "node --import tsx scripts/preview-registry.ts",
     "registry:test": "node --import tsx --test scripts/build-skill-registry.test.ts",
+    "site:build": "node --import tsx scripts/build-site.ts",
+    "site:preview": "node --import tsx scripts/build-site.ts && npx -y serve dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.15.0",
     "@types/node": "^22.13.10",
     "eslint": "^9.22.0",
+    "husky": "^9.1.7",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   }

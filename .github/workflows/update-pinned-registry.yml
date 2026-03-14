@@ -5,13 +5,7 @@ on:
     branches:
       - main
     paths:
-      - skills/**
-      - meta.ts
-      - README.md
-      - vendor/**
-      - sources/**
-      - scripts/**
-      - package.json
+      - .preview/**
       - .github/workflows/update-pinned-registry.yml
   workflow_dispatch:
     inputs:
@@ -41,20 +35,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Validate issue numbers
         run: |
@@ -63,32 +43,14 @@ jobs:
             exit 1
           fi
 
-      - name: Build registry markdown
-        env:
-          GH_TOKEN: ${{ github.token }}
-          MY_SKILL_FILE: ${{ runner.temp }}/my-skills-registry.md
-          OTHER_SKILL_FILE: ${{ runner.temp }}/other-skills-registry.md
-          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
-          AI_API_KEY: ${{ secrets.AI_API_KEY }}
-          AI_MODEL: ${{ secrets.AI_MODEL }}
-        run: |
-          pnpm registry:build -- \
-            --base "${{ github.event.before }}" \
-            --head "${{ github.sha }}" \
-            --output-my "$MY_SKILL_FILE" \
-            --output-other "$OTHER_SKILL_FILE" \
-            --summarize
-
       - name: Update my skills issue
         if: env.MY_SKILL_ISSUE != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          MY_SKILL_FILE: ${{ runner.temp }}/my-skills-registry.md
-        run: gh issue edit "$MY_SKILL_ISSUE" --body-file "$MY_SKILL_FILE"
+        run: gh issue edit "$MY_SKILL_ISSUE" --body-file .preview/my-skills-registry.md
 
       - name: Update other skills issue
         if: env.OTHER_SKILL_ISSUE != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          OTHER_SKILL_FILE: ${{ runner.temp }}/other-skills-registry.md
-        run: gh issue edit "$OTHER_SKILL_ISSUE" --body-file "$OTHER_SKILL_FILE"
+        run: gh issue edit "$OTHER_SKILL_ISSUE" --body-file .preview/other-skills-registry.md
