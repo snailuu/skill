@@ -65,6 +65,7 @@ jobs:
 
       - name: Build registry markdown
         env:
+          GH_TOKEN: ${{ github.token }}
           MY_SKILL_FILE: ${{ runner.temp }}/my-skills-registry.md
           OTHER_SKILL_FILE: ${{ runner.temp }}/other-skills-registry.md
           AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
