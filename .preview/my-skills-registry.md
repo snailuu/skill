@@ -3,7 +3,7 @@
 ## Overview
 - 仓库手写技能索引
 - 安装方式：`pnpx skills add snailuu/skill --skill <name>`
-- 最后更新时间：2026-03-14 13:45:57 UTC
+- 最后更新时间：2026-03-14 14:08:52 UTC
 - Manual skills：7
 
 ## Manual Skills

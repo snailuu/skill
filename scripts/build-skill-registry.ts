@@ -196,7 +196,7 @@ async function translateOne(
     const data = await response.json() as {
       choices?: { message?: { content?: string } }[]
     }
-    return data.choices?.[0]?.message?.content?.trim() || null
+    return data.choices?.[0]?.message?.content?.trim().replace(/\n+/g, ' ') || null
   }
   catch {
     return null
@@ -655,7 +655,7 @@ function renderVendorSkillTable(skills: VendorSkillInfo[]): string {
 
   const rows = skills
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(skill => `| \`${skill.name}\` | ${skill.description} |`)
+    .map(skill => `| \`${skill.name}\` | ${skill.description.replace(/\n+/g, ' ')} |`)
 
   return [
     '| 技能名称 | 说明 |',
