@@ -1,6 +1,8 @@
 [submodule "vendor/antfu"]
 	path = vendor/antfu
 	url = https://github.com/antfu/skills
+	ignore = dirty
 [submodule "vendor/baoyu"]
 	path = vendor/baoyu
 	url = https://github.com/JimLiu/baoyu-skills
+	ignore = dirty
