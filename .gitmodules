@@ -1,3 +1,6 @@
 [submodule "vendor/antfu"]
 	path = vendor/antfu
 	url = https://github.com/antfu/skills
+[submodule "vendor/baoyu"]
+	path = vendor/baoyu
+	url = https://github.com/JimLiu/baoyu-skills

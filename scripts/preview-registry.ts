@@ -2,8 +2,8 @@
  * 本地预览 registry issue 输出效果
  *
  * 用法：
- *   pnpm registry:preview                # 纯模板输出（无 AI 摘要）
- *   pnpm registry:preview --summarize    # 带 AI 摘要（需要 .env 配置）
+ *   pnpm registry:preview                # 纯模板输出（无翻译）
+ *   pnpm registry:preview --summarize    # 带翻译（需要 .env 配置）
  *
  * 环境变量从项目根目录 .env 文件读取
  */
@@ -62,14 +62,10 @@ async function main(): Promise<void> {
     collectRegistryData,
     renderMySkillsMarkdown,
     renderOtherSkillsMarkdown,
-    generateAISummary,
     translateVendorDescriptions,
   } = await import('./build-skill-registry.js')
 
   const data = collectRegistryData([])
-
-  let mySummary: string | null = null
-  let otherSummary: string | null = null
 
   if (summarize) {
     const baseUrl = process.env.AI_BASE_URL
@@ -100,29 +96,10 @@ async function main(): Promise<void> {
     else {
       console.warn('⚠ 翻译失败，保留英文原文')
     }
-
-    // 生成摘要
-    console.log(`生成 AI 摘要 (${model})...`)
-
-    const myDraft = renderMySkillsMarkdown(data)
-    const otherDraft = renderOtherSkillsMarkdown(data)
-
-    const results = await Promise.allSettled([
-      generateAISummary(myDraft, 'my', config),
-      generateAISummary(otherDraft, 'other', config),
-    ])
-
-    mySummary = results[0].status === 'fulfilled' ? results[0].value : null
-    otherSummary = results[1].status === 'fulfilled' ? results[1].value : null
-
-    if (!mySummary)
-      console.warn('⚠ 自定义 Skills 摘要生成失败，使用纯模板输出')
-    if (!otherSummary)
-      console.warn('⚠ 外部 Skills 摘要生成失败，使用纯模板输出')
   }
 
-  writeFileSync(myFile, renderMySkillsMarkdown(data, mySummary), 'utf8')
-  writeFileSync(otherFile, renderOtherSkillsMarkdown(data, otherSummary), 'utf8')
+  writeFileSync(myFile, renderMySkillsMarkdown(data), 'utf8')
+  writeFileSync(otherFile, renderOtherSkillsMarkdown(data), 'utf8')
 
   console.log('')
   console.log('预览文件已生成：')

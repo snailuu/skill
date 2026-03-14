@@ -7,7 +7,6 @@ import {
   buildSkillTags,
   classifySkill,
   detectRecentChanges,
-  generateAISummary,
   parseReadmeManualSkills,
   parseSkillFrontmatter,
   renderMySkillsMarkdown,
@@ -229,65 +228,5 @@ test('renderOtherSkillsMarkdown 会输出外部技能相关结构', () => {
   assert.match(markdown, /Vue 3 framework/)
   assert.doesNotMatch(markdown, /Manual Skills/)
   assert.doesNotMatch(markdown, /Consistency Checks/)
-})
-
-test('renderMySkillsMarkdown 传入 summary 时会插入引用块', () => {
-  const markdown = renderMySkillsMarkdown({
-    generatedAt: '2026-03-09T12:00:00.000Z',
-    overview: { manualCount: 0, vendorCount: 0, submoduleCount: 0 },
-    manualSkills: [],
-    vendors: [],
-    submodules: [],
-    checks: {
-      manualMissingDirs: [],
-      skillDirsMissingFromManual: [],
-      readmeMissingManualSkills: [],
-      readmeMissingInstallExamples: [],
-    },
-    recentChanges: {
-      newManualSkills: [],
-      updatedManualSkills: [],
-      touchedMeta: false,
-      touchedReadme: false,
-      touchedVendors: false,
-      touchedSubmodules: false,
-    },
-  }, '这是 AI 生成的摘要。')
-
-  assert.match(markdown, /^> 这是 AI 生成的摘要。$/m)
-})
-
-test('renderMySkillsMarkdown 不传 summary 时没有引用块', () => {
-  const markdown = renderMySkillsMarkdown({
-    generatedAt: '2026-03-09T12:00:00.000Z',
-    overview: { manualCount: 0, vendorCount: 0, submoduleCount: 0 },
-    manualSkills: [],
-    vendors: [],
-    submodules: [],
-    checks: {
-      manualMissingDirs: [],
-      skillDirsMissingFromManual: [],
-      readmeMissingManualSkills: [],
-      readmeMissingInstallExamples: [],
-    },
-    recentChanges: {
-      newManualSkills: [],
-      updatedManualSkills: [],
-      touchedMeta: false,
-      touchedReadme: false,
-      touchedVendors: false,
-      touchedSubmodules: false,
-    },
-  })
-
-  assert.doesNotMatch(markdown, /^>/m)
-})
-
-test('generateAISummary 在无效配置时返回 null', async () => {
-  const result = await generateAISummary('test content', 'my', {
-    baseUrl: 'https://invalid.example.com/v1',
-    apiKey: 'invalid-key',
-    model: 'invalid-model',
-  })
-  assert.equal(result, null)
+  assert.match(markdown, /来源概览/)
 })
