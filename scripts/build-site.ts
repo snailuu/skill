@@ -502,6 +502,7 @@ function main(): void {
     mkdirSync(outDir, { recursive: true })
 
   writeFileSync(join(outDir, 'index.html'), html, 'utf8')
+  writeFileSync(join(outDir, 'CNAME'), 'skills.snailuu.cn', 'utf8')
   console.log(`站点已生成：dist/index.html（${sections.reduce((s, sec) => s + sec.items.length, 0)} 个技能）`)
 }
 
