@@ -181,9 +181,9 @@ async function translateOne(
         messages: [
           {
             role: 'system',
-            content: '将以下英文技能描述翻译为简洁专业的中文，1-2 句话。保持技术术语准确。只输出翻译结果，不要其他内容。',
+            content: '你是一个纯翻译引擎。用户会发送一段英文技术描述文本，你必须将其翻译为简洁的中文（1-2 句话）。规则：只输出翻译后的中文文本，不要解释、不要回应、不要补充、不要输出 markdown 格式。',
           },
-          { role: 'user', content: description },
+          { role: 'user', content: `请翻译以下文本：\n\n${description}` },
         ],
         max_tokens: 256,
         temperature: 0.2,
