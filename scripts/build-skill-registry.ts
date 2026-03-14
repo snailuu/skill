@@ -161,25 +161,19 @@ export function fetchVendorSkills(source: string): VendorSkillInfo[] {
 }
 
 /**
- * 批量翻译 vendor 技能描述为中文
- * 将所有 vendor 的技能描述打包成一次 API 调用，返回翻译后的映射
+ * 翻译单个 vendor 的技能描述为中文
  */
-export async function translateVendorDescriptions(
-  vendors: VendorSummary[],
+async function translateBatch(
+  skills: VendorSkillInfo[],
+  vendorName: string,
   config: AIConfig,
 ): Promise<Map<string, string>> {
-  const entries: { key: string, description: string }[] = []
-
-  for (const vendor of vendors) {
-    for (const skill of vendor.fetchedSkills) {
-      entries.push({ key: `${vendor.name}/${skill.name}`, description: skill.description })
-    }
-  }
-
-  if (!entries.length)
+  if (!skills.length)
     return new Map()
 
-  const input = Object.fromEntries(entries.map(e => [e.key, e.description]))
+  const input = Object.fromEntries(
+    skills.map(s => [`${vendorName}/${s.name}`, s.description]),
+  )
   const endpoint = config.baseUrl.replace(/\/+$/, '') + '/chat/completions'
 
   try {
@@ -194,11 +188,11 @@ export async function translateVendorDescriptions(
         messages: [
           {
             role: 'system',
-            content: '你是一个技术文档翻译助手。请将以下 JSON 中每个 key 对应的英文技能描述翻译为简洁专业的中文。保持技术术语准确，语气简洁。返回相同结构的 JSON，key 不变，value 替换为中文翻译。只输出 JSON，不要其他内容。',
+            content: '你是一个技术文档翻译助手。请将以下 JSON 中每个 key 对应的英文技能描述翻译为简洁专业的中文。保持技术术语准确，每条翻译控制在 1-2 句话。返回相同结构的 JSON，key 不变，value 替换为中文翻译。只输出 JSON，不要其他内容。',
           },
           { role: 'user', content: JSON.stringify(input) },
         ],
-        max_tokens: 4096,
+        max_tokens: 8192,
         temperature: 0.2,
       }),
     })
@@ -222,6 +216,29 @@ export async function translateVendorDescriptions(
   catch {
     return new Map()
   }
+}
+
+/**
+ * 按 vendor 分批翻译技能描述为中文
+ */
+export async function translateVendorDescriptions(
+  vendors: VendorSummary[],
+  config: AIConfig,
+): Promise<Map<string, string>> {
+  const results = await Promise.allSettled(
+    vendors
+      .filter(v => v.fetchedSkills.length > 0)
+      .map(v => translateBatch(v.fetchedSkills, v.name, config)),
+  )
+
+  const merged = new Map<string, string>()
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      for (const [key, value] of result.value)
+        merged.set(key, value)
+    }
+  }
+  return merged
 }
 
 export async function generateAISummary(
