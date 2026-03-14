@@ -19,8 +19,10 @@ export const vendors: Record<string, VendorSkillMeta> = {
   antfu: {
     official: true,
     source: 'https://github.com/antfu/skills',
-    // 当前仅作为外部技能来源索引，不同步到本仓库 skills/
-    // 如需二次分发，可按 sourceSkillName -> outputSkillName 增加映射后执行 start:sync
+    skills: {},
+  },
+  baoyu: {
+    source: 'https://github.com/JimLiu/baoyu-skills',
     skills: {},
   },
 }

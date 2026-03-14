@@ -7,9 +7,11 @@ import {
   buildSkillTags,
   classifySkill,
   detectRecentChanges,
+  generateAISummary,
   parseReadmeManualSkills,
   parseSkillFrontmatter,
-  renderRegistryMarkdown,
+  renderMySkillsMarkdown,
+  renderOtherSkillsMarkdown,
 } from './build-skill-registry.js'
 
 test('parseSkillFrontmatter 能解析 name 和 description', () => {
@@ -35,6 +37,21 @@ description: "当用户说\\\"代码审查\\\"时触发"
 `)
 
   assert.equal(parsed.description, '当用户说"代码审查"时触发')
+})
+
+test('parseSkillFrontmatter 能解析 YAML 多行 description', () => {
+  const parsed = parseSkillFrontmatter(`---
+name: turborepo
+description: |
+  Turborepo monorepo build system guidance.
+  Use when user configures tasks or pipelines.
+metadata:
+  author: test
+---
+`)
+
+  assert.equal(parsed.name, 'turborepo')
+  assert.equal(parsed.description, 'Turborepo monorepo build system guidance. Use when user configures tasks or pipelines.')
 })
 
 test('detectRecentChanges 能区分新增和更新的 manual skill', () => {
@@ -102,8 +119,8 @@ test('parseReadmeManualSkills 能解析 README 中的手写技能列表', () => 
   ])
 })
 
-test('renderRegistryMarkdown 会输出固定结构', () => {
-  const markdown = renderRegistryMarkdown({
+test('renderMySkillsMarkdown 会输出自定义技能相关结构', () => {
+  const markdown = renderMySkillsMarkdown({
     generatedAt: '2026-03-09T12:00:00.000Z',
     overview: {
       manualCount: 1,
@@ -124,6 +141,7 @@ test('renderRegistryMarkdown 会输出固定结构', () => {
       source: 'https://github.com/antfu/skills',
       official: true,
       mappedSkillNames: [],
+      fetchedSkills: [{ name: 'vue', description: 'Vue 3 framework' }],
     }],
     submodules: [{
       name: 'docs',
@@ -146,13 +164,130 @@ test('renderRegistryMarkdown 会输出固定结构', () => {
     },
   })
 
-  assert.match(markdown, /^# Skills Registry/m)
+  assert.match(markdown, /^# 自定义 Skills Registry/m)
   assert.match(markdown, /^## Manual Skills/m)
   assert.match(markdown, /^### Release/m)
-  assert.match(markdown, /^## Vendor Sources/m)
-  assert.match(markdown, /^## Submodule Sources \/ Source Repos/m)
   assert.match(markdown, /^## Recent Changes/m)
   assert.match(markdown, /^## Consistency Checks/m)
   assert.match(markdown, /writing-changelogs/)
   assert.match(markdown, /标签：`release`、`changelog`、`writing`/)
+  assert.doesNotMatch(markdown, /Vendor Sources/)
+  assert.doesNotMatch(markdown, /Submodule Sources/)
+})
+
+test('renderOtherSkillsMarkdown 会输出外部技能相关结构', () => {
+  const markdown = renderOtherSkillsMarkdown({
+    generatedAt: '2026-03-09T12:00:00.000Z',
+    overview: {
+      manualCount: 1,
+      vendorCount: 1,
+      submoduleCount: 1,
+    },
+    manualSkills: [{
+      category: 'release',
+      name: 'writing-changelogs',
+      title: '编写 CHANGELOG 技能',
+      description: 'Use when 需要根据 git 历史生成或更新 CHANGELOG.md',
+      path: 'skills/writing-changelogs',
+      hasReferences: true,
+      tags: ['release', 'changelog', 'writing'],
+    }],
+    vendors: [{
+      name: 'antfu',
+      source: 'https://github.com/antfu/skills',
+      official: true,
+      mappedSkillNames: [],
+      fetchedSkills: [{ name: 'vue', description: 'Vue 3 framework' }],
+    }],
+    submodules: [{
+      name: 'docs',
+      source: 'https://github.com/example/docs',
+      path: 'sources/docs',
+    }],
+    checks: {
+      manualMissingDirs: [],
+      skillDirsMissingFromManual: [],
+      readmeMissingManualSkills: [],
+      readmeMissingInstallExamples: [],
+    },
+    recentChanges: {
+      newManualSkills: [],
+      updatedManualSkills: [],
+      touchedMeta: false,
+      touchedReadme: false,
+      touchedVendors: true,
+      touchedSubmodules: true,
+    },
+  })
+
+  assert.match(markdown, /^# 外部 Skills Registry/m)
+  assert.match(markdown, /^## Vendor Sources/m)
+  assert.match(markdown, /^## Submodule Sources \/ Source Repos/m)
+  assert.match(markdown, /antfu/)
+  assert.match(markdown, /技能名称/)
+  assert.match(markdown, /`vue`/)
+  assert.match(markdown, /Vue 3 framework/)
+  assert.doesNotMatch(markdown, /Manual Skills/)
+  assert.doesNotMatch(markdown, /Consistency Checks/)
+})
+
+test('renderMySkillsMarkdown 传入 summary 时会插入引用块', () => {
+  const markdown = renderMySkillsMarkdown({
+    generatedAt: '2026-03-09T12:00:00.000Z',
+    overview: { manualCount: 0, vendorCount: 0, submoduleCount: 0 },
+    manualSkills: [],
+    vendors: [],
+    submodules: [],
+    checks: {
+      manualMissingDirs: [],
+      skillDirsMissingFromManual: [],
+      readmeMissingManualSkills: [],
+      readmeMissingInstallExamples: [],
+    },
+    recentChanges: {
+      newManualSkills: [],
+      updatedManualSkills: [],
+      touchedMeta: false,
+      touchedReadme: false,
+      touchedVendors: false,
+      touchedSubmodules: false,
+    },
+  }, '这是 AI 生成的摘要。')
+
+  assert.match(markdown, /^> 这是 AI 生成的摘要。$/m)
+})
+
+test('renderMySkillsMarkdown 不传 summary 时没有引用块', () => {
+  const markdown = renderMySkillsMarkdown({
+    generatedAt: '2026-03-09T12:00:00.000Z',
+    overview: { manualCount: 0, vendorCount: 0, submoduleCount: 0 },
+    manualSkills: [],
+    vendors: [],
+    submodules: [],
+    checks: {
+      manualMissingDirs: [],
+      skillDirsMissingFromManual: [],
+      readmeMissingManualSkills: [],
+      readmeMissingInstallExamples: [],
+    },
+    recentChanges: {
+      newManualSkills: [],
+      updatedManualSkills: [],
+      touchedMeta: false,
+      touchedReadme: false,
+      touchedVendors: false,
+      touchedSubmodules: false,
+    },
+  })
+
+  assert.doesNotMatch(markdown, /^>/m)
+})
+
+test('generateAISummary 在无效配置时返回 null', async () => {
+  const result = await generateAISummary('test content', 'my', {
+    baseUrl: 'https://invalid.example.com/v1',
+    apiKey: 'invalid-key',
+    model: 'invalid-model',
+  })
+  assert.equal(result, null)
 })

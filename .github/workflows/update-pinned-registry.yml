@@ -15,8 +15,12 @@ on:
       - .github/workflows/update-pinned-registry.yml
   workflow_dispatch:
     inputs:
-      issue_number:
-        description: Pinned issue 编号，留空时使用仓库变量 PINNED_ISSUE_NUMBER
+      my_skill_issue_number:
+        description: 自定义 Skills issue 编号，留空时使用 Secrets.MY_SKILL_ISSUE_NUMBER
+        required: false
+        type: string
+      other_skill_issue_number:
+        description: 外部 Skills issue 编号，留空时使用 Secrets.OTHER_SKILL_ISSUE_NUMBER
         required: false
         type: string
 
@@ -32,7 +36,8 @@ jobs:
   update-registry:
     runs-on: ubuntu-latest
     env:
-      ISSUE_NUMBER: ${{ github.event.inputs.issue_number || secrets.PINNED_ISSUE_NUMBER }}
+      MY_SKILL_ISSUE: ${{ github.event.inputs.my_skill_issue_number || secrets.MY_SKILL_ISSUE_NUMBER }}
+      OTHER_SKILL_ISSUE: ${{ github.event.inputs.other_skill_issue_number || secrets.OTHER_SKILL_ISSUE_NUMBER }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -51,21 +56,38 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate issue number
+      - name: Validate issue numbers
         run: |
-          if [ -z "$ISSUE_NUMBER" ]; then
-            echo "未配置 Secrets.PINNED_ISSUE_NUMBER，且未在 workflow_dispatch 中传入 issue_number。"
+          if [ -z "$MY_SKILL_ISSUE" ] && [ -z "$OTHER_SKILL_ISSUE" ]; then
+            echo "至少需要配置一个 issue 编号（MY_SKILL_ISSUE_NUMBER 或 OTHER_SKILL_ISSUE_NUMBER）。"
             exit 1
           fi
 
       - name: Build registry markdown
         env:
-          REGISTRY_FILE: ${{ runner.temp }}/skills-registry.md
+          MY_SKILL_FILE: ${{ runner.temp }}/my-skills-registry.md
+          OTHER_SKILL_FILE: ${{ runner.temp }}/other-skills-registry.md
+          AI_BASE_URL: ${{ secrets.AI_BASE_URL }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ secrets.AI_MODEL }}
         run: |
-          pnpm registry:build -- --base "${{ github.event.before }}" --head "${{ github.sha }}" --output "$REGISTRY_FILE"
+          pnpm registry:build -- \
+            --base "${{ github.event.before }}" \
+            --head "${{ github.sha }}" \
+            --output-my "$MY_SKILL_FILE" \
+            --output-other "$OTHER_SKILL_FILE" \
+            --summarize
 
-      - name: Update pinned issue body
+      - name: Update my skills issue
+        if: env.MY_SKILL_ISSUE != ''
         env:
           GH_TOKEN: ${{ github.token }}
-          REGISTRY_FILE: ${{ runner.temp }}/skills-registry.md
-        run: gh issue edit "$ISSUE_NUMBER" --body-file "$REGISTRY_FILE"
+          MY_SKILL_FILE: ${{ runner.temp }}/my-skills-registry.md
+        run: gh issue edit "$MY_SKILL_ISSUE" --body-file "$MY_SKILL_FILE"
+
+      - name: Update other skills issue
+        if: env.OTHER_SKILL_ISSUE != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          OTHER_SKILL_FILE: ${{ runner.temp }}/other-skills-registry.md
+        run: gh issue edit "$OTHER_SKILL_ISSUE" --body-file "$OTHER_SKILL_FILE"
