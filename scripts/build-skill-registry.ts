@@ -161,19 +161,12 @@ export function fetchVendorSkills(source: string): VendorSkillInfo[] {
 }
 
 /**
- * 翻译单个 vendor 的技能描述为中文
+ * 翻译单条技能描述为中文
  */
-async function translateBatch(
-  skills: VendorSkillInfo[],
-  vendorName: string,
+async function translateOne(
+  description: string,
   config: AIConfig,
-): Promise<Map<string, string>> {
-  if (!skills.length)
-    return new Map()
-
-  const input = Object.fromEntries(
-    skills.map(s => [`${vendorName}/${s.name}`, s.description]),
-  )
+): Promise<string | null> {
   const endpoint = config.baseUrl.replace(/\/+$/, '') + '/chat/completions'
 
   try {
@@ -188,55 +181,54 @@ async function translateBatch(
         messages: [
           {
             role: 'system',
-            content: '你是一个技术文档翻译助手。请将以下 JSON 中每个 key 对应的英文技能描述翻译为简洁专业的中文。保持技术术语准确，每条翻译控制在 1-2 句话。返回相同结构的 JSON，key 不变，value 替换为中文翻译。只输出 JSON，不要其他内容。',
+            content: '将以下英文技能描述翻译为简洁专业的中文，1-2 句话。保持技术术语准确。只输出翻译结果，不要其他内容。',
           },
-          { role: 'user', content: JSON.stringify(input) },
+          { role: 'user', content: description },
         ],
-        max_tokens: 8192,
+        max_tokens: 256,
         temperature: 0.2,
       }),
     })
 
     if (!response.ok)
-      return new Map()
+      return null
 
     const data = await response.json() as {
       choices?: { message?: { content?: string } }[]
     }
-
-    const raw = data.choices?.[0]?.message?.content?.trim()
-    if (!raw)
-      return new Map()
-
-    // 提取 JSON（可能被 markdown 代码块包裹）
-    const jsonStr = raw.replace(/^```(?:json)?\s*\n?/, '').replace(/\n?```\s*$/, '')
-    const parsed = JSON.parse(jsonStr) as Record<string, string>
-    return new Map(Object.entries(parsed))
+    return data.choices?.[0]?.message?.content?.trim() || null
   }
   catch {
-    return new Map()
+    return null
   }
 }
 
 /**
- * 按 vendor 分批翻译技能描述为中文
+ * 并发翻译所有 vendor 技能描述为中文
  */
 export async function translateVendorDescriptions(
   vendors: VendorSummary[],
   config: AIConfig,
 ): Promise<Map<string, string>> {
+  const tasks: { key: string, description: string }[] = []
+
+  for (const vendor of vendors) {
+    for (const skill of vendor.fetchedSkills)
+      tasks.push({ key: `${vendor.name}/${skill.name}`, description: skill.description })
+  }
+
+  if (!tasks.length)
+    return new Map()
+
   const results = await Promise.allSettled(
-    vendors
-      .filter(v => v.fetchedSkills.length > 0)
-      .map(v => translateBatch(v.fetchedSkills, v.name, config)),
+    tasks.map(t => translateOne(t.description, config)),
   )
 
   const merged = new Map<string, string>()
-  for (const result of results) {
-    if (result.status === 'fulfilled') {
-      for (const [key, value] of result.value)
-        merged.set(key, value)
-    }
+  for (let i = 0; i < tasks.length; i++) {
+    const result = results[i]
+    if (result.status === 'fulfilled' && result.value)
+      merged.set(tasks[i].key, result.value)
   }
   return merged
 }
