@@ -1,49 +1,9 @@
 # 自定义 Skills Registry
 
-> 已收到你的自定义 Skills Registry。
-
-当前可用手写技能共 7 个，主要包括：
-
-- Git
-  - `git-commit-gen`
-  - `git-exclude`
-- Review
-  - `code-review-expert`
-  - `pr-review`
-- Planning
-  - `smart-plan`
-- Writing
-  - `skill-writer`
-- Release
-  - `writing-changelogs`
-
-我会在后续对话中按你的技能定义来理解请求。比如：
-
-- 你说“生成 commit / 帮我写提交信息” → 我会按 `git-commit-gen` 的场景处理
-- 你说“本地忽略某个文件，不改 .gitignore” → 我会按 `git-exclude`
-- 你说“帮我 review 代码 / 审查变更” → 我会按 `code-review-expert`
-- 你说“看一下 PR 评论” → 我会按 `pr-review`
-- 你说“生成计划” → 可按 `smart-plan`
-- 你说“写 CHANGELOG” → 我会按 `writing-changelogs`
-
-一致性检查结果也正常：
-
-- manual entries 都有对应目录
-- `skills/` 中的技能都已登记
-- README 已覆盖手写技能和安装示例
-
-你接下来可以直接告诉我你想用哪个技能，或者直接描述任务，例如：
-
-- “根据当前改动生成 commit message”
-- “把 `local.config.json` 加到本地忽略”
-- “帮我 review 这段代码”
-- “查看 PR 123 的评论并给建议”
-- “根据 git 历史更新 CHANGELOG”
-
 ## Overview
 - 仓库手写技能索引
 - 安装方式：`pnpx skills add snailuu/skill --skill <name>`
-- 最后更新时间：2026-03-14 07:43:28 UTC
+- 最后更新时间：2026-03-14 13:45:57 UTC
 - Manual skills：7
 
 ## Manual Skills
