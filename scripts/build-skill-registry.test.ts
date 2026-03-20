@@ -161,6 +161,81 @@ test('translateManualSkillTexts 会翻译 manual 技能标题与描述', async (
   assert.equal(skills[0].description, '中文描述')
 })
 
+test('translateManualSkillTexts 不会翻译中文为主且仅夹少量英文术语的文案', async () => {
+  const originalFetch = globalThis.fetch
+  let callCount = 0
+
+  globalThis.fetch = async () => {
+    callCount++
+    throw new Error('不应触发翻译请求')
+  }
+
+  const skills = [{
+    category: 'git' as const,
+    name: 'git-commit-gen',
+    title: 'Git Commit 信息生成技能',
+    description: '根据 git status 和 git diff 自动生成符合规范的中文 commit message，支持 Conventional Commits 格式。',
+    path: 'skills/git-commit-gen',
+    hasReferences: true,
+    tags: ['git'],
+  }]
+
+  try {
+    await translateManualSkillTexts(skills, {
+      apiKey: 'test-key',
+      baseUrl: 'https://example.com',
+      model: 'test-model',
+    })
+  }
+  finally {
+    globalThis.fetch = originalFetch
+  }
+
+  assert.equal(callCount, 0)
+  assert.equal(skills[0].title, 'Git Commit 信息生成技能')
+  assert.equal(skills[0].description, '根据 git status 和 git diff 自动生成符合规范的中文 commit message，支持 Conventional Commits 格式。')
+})
+
+test('translateManualSkillTexts 会丢弃解释型翻译结果并保留原文', async () => {
+  const originalFetch = globalThis.fetch
+  const responses = [
+    '“Stitch Design Taste — Semantic Design System Skill” 可翻译为：**Stitch 设计品味——语义化设计系统能力** 如果你愿意，我也可以根据语境给你几个版本。',
+    'Semantic Design System Skill for Google Stitch. If you want, I can also rewrite it in a more natural tone.',
+  ]
+  let index = 0
+
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      choices: [{ message: { content: responses[index++] } }],
+    }),
+  }) as Response
+
+  const skills = [{
+    category: 'workflow' as const,
+    name: 'ui-stitch-taste',
+    title: 'Stitch Design Taste — Semantic Design System Skill',
+    description: 'Semantic Design System Skill for Google Stitch.',
+    path: 'skills/ui-stitch-taste',
+    hasReferences: false,
+    tags: ['workflow'],
+  }]
+
+  try {
+    await translateManualSkillTexts(skills, {
+      apiKey: 'test-key',
+      baseUrl: 'https://example.com',
+      model: 'test-model',
+    })
+  }
+  finally {
+    globalThis.fetch = originalFetch
+  }
+
+  assert.equal(skills[0].title, 'Stitch Design Taste — Semantic Design System Skill')
+  assert.equal(skills[0].description, 'Semantic Design System Skill for Google Stitch.')
+})
+
 test('parseReadmeManualSkills 能解析 README 中的手写技能列表', () => {
   const skills = parseReadmeManualSkills(`
 当前已包含手写技能：

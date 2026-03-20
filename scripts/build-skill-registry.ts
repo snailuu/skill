@@ -197,7 +197,8 @@ async function translateOne(
     const data = await response.json() as {
       choices?: { message?: { content?: string } }[]
     }
-    return data.choices?.[0]?.message?.content?.trim().replace(/\n+/g, ' ') || null
+    const translated = data.choices?.[0]?.message?.content
+    return sanitizeTranslatedText(description, translated)
   }
   catch {
     return null
@@ -235,7 +236,50 @@ export async function translateVendorDescriptions(
 }
 
 function shouldTranslateText(text: string): boolean {
-  return /[a-z]{3}/i.test(text)
+  const englishSegments = text.match(/[a-z][a-z0-9+.-]*/gi)?.length ?? 0
+  const chineseChars = text.match(/[\u3400-\u9FFF]/g)?.length ?? 0
+
+  if (!englishSegments)
+    return false
+
+  if (!chineseChars)
+    return true
+
+  // 中文占主导时保留原文，避免把夹少量技术术语的中文说明再次送去翻译。
+  return englishSegments * 2 > chineseChars
+}
+
+function sanitizeTranslatedText(original: string, translated?: string): string | null {
+  const normalized = translated?.trim().replace(/\n+/g, ' ') || ''
+  if (!normalized)
+    return null
+
+  const rejectPatterns = [
+    /可以翻译为/,
+    /可翻译为/,
+    /也可以译为/,
+    /如果你愿意/,
+    /如果想更自然/,
+    /如果你告诉我/,
+    /根据语境/,
+    /我也可以/,
+    /I can also/i,
+    /If you want/i,
+  ]
+
+  if (rejectPatterns.some(pattern => pattern.test(normalized)))
+    return null
+
+  const originalHasChinese = /[\u3400-\u9FFF]/.test(original)
+  const translatedHasChinese = /[\u3400-\u9FFF]/.test(normalized)
+
+  if (!translatedHasChinese && originalHasChinese)
+    return null
+
+  if (!translatedHasChinese && !originalHasChinese)
+    return null
+
+  return normalized
 }
 
 export async function translateManualSkillTexts(
