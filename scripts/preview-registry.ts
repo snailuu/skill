@@ -63,6 +63,7 @@ async function main(): Promise<void> {
     collectRegistryData,
     renderMySkillsMarkdown,
     renderOtherSkillsMarkdown,
+    translateManualSkillTexts,
     translateVendorDescriptions,
   } = await import('./build-skill-registry.js')
 
@@ -97,6 +98,9 @@ async function main(): Promise<void> {
     else {
       console.warn('⚠ 翻译失败，保留英文原文')
     }
+
+    console.log(`翻译自定义技能文案 (${model})...`)
+    await translateManualSkillTexts(data.manualSkills, config)
   }
 
   writeFileSync(myFile, renderMySkillsMarkdown(data), 'utf8')

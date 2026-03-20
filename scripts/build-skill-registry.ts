@@ -234,6 +234,48 @@ export async function translateVendorDescriptions(
   return merged
 }
 
+function shouldTranslateText(text: string): boolean {
+  return /[a-z]{3}/i.test(text)
+}
+
+export async function translateManualSkillTexts(
+  manualSkills: ManualSkillSummary[],
+  config: AIConfig,
+): Promise<void> {
+  const tasks: Array<{ key: string, text: string }> = []
+
+  for (const skill of manualSkills) {
+    if (shouldTranslateText(skill.title))
+      tasks.push({ key: `${skill.name}:title`, text: skill.title })
+
+    if (shouldTranslateText(skill.description))
+      tasks.push({ key: `${skill.name}:description`, text: skill.description })
+  }
+
+  if (!tasks.length)
+    return
+
+  const results = await Promise.allSettled(tasks.map(task => translateOne(task.text, config)))
+  const translations = new Map<string, string>()
+
+  for (let index = 0; index < tasks.length; index++) {
+    const result = results[index]
+    if (result.status === 'fulfilled' && result.value)
+      translations.set(tasks[index].key, result.value)
+  }
+
+  for (const skill of manualSkills) {
+    const translatedTitle = translations.get(`${skill.name}:title`)
+    const translatedDescription = translations.get(`${skill.name}:description`)
+
+    if (translatedTitle)
+      skill.title = translatedTitle
+
+    if (translatedDescription)
+      skill.description = translatedDescription
+  }
+}
+
 function readFile(path: string): string {
   return readFileSync(path, 'utf8')
 }
@@ -246,8 +288,26 @@ function normalizeSkillText(input: { description: string, name: string, title: s
   return `${input.name} ${input.title} ${input.description}`.toLowerCase()
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function includesKeyword(text: string, keyword: string): boolean {
+  const normalizedKeyword = keyword.toLowerCase()
+
+  if (/[\u3400-\u9FFF]/.test(normalizedKeyword))
+    return text.includes(normalizedKeyword)
+
+  if (/^[a-z0-9]+$/i.test(normalizedKeyword)) {
+    const pattern = new RegExp(`(^|[^a-z0-9])${escapeRegExp(normalizedKeyword)}([^a-z0-9]|$)`, 'i')
+    return pattern.test(text)
+  }
+
+  return text.includes(normalizedKeyword)
+}
+
 function includesAny(text: string, keywords: string[]): boolean {
-  return keywords.some(keyword => text.includes(keyword))
+  return keywords.some(keyword => includesKeyword(text, keyword))
 }
 
 const categoryOrder: SkillCategory[] = [
@@ -297,7 +357,7 @@ export function buildSkillTags(input: { description: string, name: string, title
   const text = normalizeSkillText(input)
   const tags = new Set<string>()
 
-  if (includesAny(text, ['git', 'commit', 'exclude', 'branch']))
+  if (includesAny(text, ['git', 'github', 'gitlab', 'commit', 'exclude', 'branch']))
     tags.add('git')
   if (includesAny(text, ['github', 'gh']))
     tags.add('github')
@@ -827,6 +887,8 @@ async function main(): Promise<void> {
         }
       }
     }
+
+    await translateManualSkillTexts(data.manualSkills, aiConfig)
   }
 
   if (options.outputMy)

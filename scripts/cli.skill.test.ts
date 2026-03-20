@@ -2,7 +2,7 @@
 
 import assert from 'node:assert/strict'
 import { spawnSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs'
+import { chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import test from 'node:test'
@@ -62,10 +62,38 @@ description: vendor 技能
   return repoDir
 }
 
-function runCli(projectDir: string, args: string[]) {
+function createFakeGit(projectDir: string): string {
+  const binDir = join(projectDir, 'bin')
+  mkdirSync(binDir, { recursive: true })
+  const gitPath = join(binDir, 'git')
+  writeFileSync(gitPath, `#!/bin/sh
+if [ "$1" = "submodule" ] && [ "$2" = "add" ]; then
+  printf '%s %s %s %s\\n' "$1" "$2" "$3" "$4" > "${projectDir}/git-invocation.log"
+  mkdir -p "${projectDir}/$4/skills/remote-skill"
+  cat > "${projectDir}/$4/skills/remote-skill/SKILL.md" <<'EOF'
+---
+name: remote-skill
+description: remote vendor skill
+---
+EOF
+  exit 0
+fi
+
+echo "unexpected git call: $@" >&2
+exit 1
+`, 'utf8')
+  chmodSync(gitPath, 0o755)
+  return binDir
+}
+
+function runCli(projectDir: string, args: string[], env: NodeJS.ProcessEnv = {}) {
   return spawnSync(tsxBin, [join(projectDir, 'scripts', 'cli.ts'), ...args], {
     cwd: projectDir,
     encoding: 'utf8',
+    env: {
+      ...process.env,
+      ...env,
+    },
   })
 }
 
@@ -112,6 +140,27 @@ test('--vendor 会登记来源并复制到 vendor 目录', () => {
   const metaContent = readFileSync(join(projectDir, 'meta.ts'), 'utf8')
   assert.match(metaContent, /demo-vendor/)
   assert.match(metaContent, /vendor-skill/)
+})
+
+test('远程 --vendor 会通过 git submodule add 接入 vendor 目录', () => {
+  const projectDir = createFixtureProject()
+  const fakeGitBin = createFakeGit(projectDir)
+
+  const result = runCli(
+    projectDir,
+    ['skill', 'https://github.com/example/taste-skill.git', '--vendor'],
+    { PATH: `${fakeGitBin}:${process.env.PATH || ''}` },
+  )
+
+  assert.equal(result.status, 0)
+  assert.equal(existsSync(join(projectDir, 'vendor', 'taste-skill', 'skills', 'remote-skill', 'SKILL.md')), true)
+
+  const gitInvocation = readFileSync(join(projectDir, 'git-invocation.log'), 'utf8')
+  assert.match(gitInvocation, /submodule add https:\/\/github\.com\/example\/taste-skill\.git vendor\/taste-skill/)
+
+  const metaContent = readFileSync(join(projectDir, 'meta.ts'), 'utf8')
+  assert.match(metaContent, /https:\/\/github\.com\/example\/taste-skill\.git/)
+  assert.match(metaContent, /remote-skill/)
 })
 
 test('--submodules 传入本地路径时直接报错', () => {

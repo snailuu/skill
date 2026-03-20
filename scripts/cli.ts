@@ -299,58 +299,52 @@ function importManualSkill(source: string): void {
 
 function importVendorSource(source: string): void {
   const githubRepo = parseGitHubRepo(source)
-  let cleanupPath = ''
   let localPath = ''
   let sourceLabel = source
   let vendorName = ''
 
-  try {
-    if (githubRepo) {
-      cleanupPath = cloneGitHubRepo(githubRepo.url)
-      localPath = cleanupPath
-      sourceLabel = githubRepo.url
-      vendorName = githubRepo.repo
-    }
-    else {
-      localPath = resolveLocalDirectory(source)
-      sourceLabel = localPath
-      vendorName = basename(localPath)
-    }
-
-    assertAvailableName(vendorName, 'vendor')
-
-    const destination = join(root, 'vendor', vendorName)
-    ensureDir(join(root, 'vendor'))
-
-    if (hasSkillFile(localPath)) {
-      const skillName = getSkillNameFromDirectory(localPath)
-      ensureDir(join(destination, 'skills'))
-      copyDirectory(localPath, join(destination, 'skills', skillName))
-    }
-    else {
-      copyDirectory(localPath, destination)
-    }
-
-    const nextVendors = Object.fromEntries(
-      Object.entries(vendors).map(([name, config]) => [name, { ...config, skills: { ...config.skills } }]),
-    )
-    nextVendors[vendorName] = {
-      source: sourceLabel,
-      skills: scanVendorSkills(destination),
-    }
-
-    writeMetaFile(
-      { ...submodules },
-      nextVendors,
-      [...manual],
-    )
-
-    console.log(`已登记 vendor：${vendorName} -> vendor/${vendorName}`)
+  if (githubRepo) {
+    sourceLabel = githubRepo.url
+    vendorName = githubRepo.repo
   }
-  finally {
-    if (cleanupPath)
-      rmSync(cleanupPath, { recursive: true, force: true })
+  else {
+    localPath = resolveLocalDirectory(source)
+    sourceLabel = localPath
+    vendorName = basename(localPath)
   }
+
+  assertAvailableName(vendorName, 'vendor')
+
+  const destination = join(root, 'vendor', vendorName)
+  ensureDir(join(root, 'vendor'))
+
+  if (githubRepo) {
+    exec(`git submodule add ${shellQuote(githubRepo.url)} ${shellQuote(`vendor/${vendorName}`)}`)
+  }
+  else if (hasSkillFile(localPath)) {
+    const skillName = getSkillNameFromDirectory(localPath)
+    ensureDir(join(destination, 'skills'))
+    copyDirectory(localPath, join(destination, 'skills', skillName))
+  }
+  else {
+    copyDirectory(localPath, destination)
+  }
+
+  const nextVendors = Object.fromEntries(
+    Object.entries(vendors).map(([name, config]) => [name, { ...config, skills: { ...config.skills } }]),
+  )
+  nextVendors[vendorName] = {
+    source: sourceLabel,
+    skills: scanVendorSkills(destination),
+  }
+
+  writeMetaFile(
+    { ...submodules },
+    nextVendors,
+    [...manual],
+  )
+
+  console.log(`已登记 vendor：${vendorName} -> vendor/${vendorName}`)
 }
 
 function importSubmoduleSource(source: string): void {

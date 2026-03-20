@@ -12,6 +12,7 @@ import {
   parseSkillFrontmatter,
   renderMySkillsMarkdown,
   renderOtherSkillsMarkdown,
+  translateManualSkillTexts,
 } from './build-skill-registry.js'
 
 test('parseSkillFrontmatter 能解析 name 和 description', () => {
@@ -113,6 +114,51 @@ test('buildSkillTags 能基于 skill 信息生成标签', () => {
     title: 'PR/MR 评论查看与建议技能',
     description: '查看 PR/MR 评论并给出解决建议，支持 GitHub 和 GitLab',
   }), ['git', 'github', 'gitlab', 'pr', 'review'])
+})
+
+test('buildSkillTags 不会把 premium 误判成 pr 标签', () => {
+  assert.deepEqual(buildSkillTags({
+    name: 'ui-stitch-taste',
+    title: 'Stitch Design Taste',
+    description: 'Semantic Design System Skill for Google Stitch with premium, agent-friendly UI standards.',
+  }), ['workflow'])
+})
+
+test('translateManualSkillTexts 会翻译 manual 技能标题与描述', async () => {
+  const originalFetch = globalThis.fetch
+  const responses = ['中文标题', '中文描述']
+  let index = 0
+
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => ({
+      choices: [{ message: { content: responses[index++] } }],
+    }),
+  }) as Response
+
+  const skills = [{
+    category: 'workflow' as const,
+    name: 'ui-stitch-taste',
+    title: 'Stitch Design Taste',
+    description: 'Semantic Design System Skill for Google Stitch.',
+    path: 'skills/ui-stitch-taste',
+    hasReferences: false,
+    tags: ['workflow'],
+  }]
+
+  try {
+    await translateManualSkillTexts(skills, {
+      apiKey: 'test-key',
+      baseUrl: 'https://example.com',
+      model: 'test-model',
+    })
+  }
+  finally {
+    globalThis.fetch = originalFetch
+  }
+
+  assert.equal(skills[0].title, '中文标题')
+  assert.equal(skills[0].description, '中文描述')
 })
 
 test('parseReadmeManualSkills 能解析 README 中的手写技能列表', () => {

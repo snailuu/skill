@@ -5,16 +5,27 @@
 当前已包含手写技能：
 
 - `code-review-expert`
+- `create-readme`
+- `diagram-gen`
 - `git-commit-gen`
 - `git-exclude`
+- `plan-writer`
 - `pr-review`
 - `skill-writer`
 - `smart-plan`
+- `ui-brutalist`
+- `ui-design-taste`
+- `ui-high-end-visual`
+- `ui-minimalist`
+- `ui-output-enforcement`
+- `ui-redesign`
+- `ui-stitch-taste`
 - `writing-changelogs`
 
 当前已接入外部技能来源：
 
 - `https://github.com/antfu/skills`
+- `https://github.com/JimLiu/baoyu-skills`
 
 ## 目录结构
 
@@ -55,6 +66,9 @@ pnpm start:cleanup
 ## Skills Registry Issue
 
 仓库内置了一个 GitHub Action，会在主分支相关文件变更后全量重写固定的 pinned issue，用于展示当前 skills registry：
+
+- 本仓库 skills 说明查看：https://github.com/snailuu/skill/issues/1
+- 外部 skills 说明查看：https://github.com/snailuu/skill/issues/2
 
 - `Manual Skills`：来自 `meta.ts` 的 `manual` 与 `skills/<name>/SKILL.md`
 - `Vendor Sources`：来自 `meta.ts` 的 `vendors`
@@ -97,10 +111,20 @@ pnpx skills add snailuu/skill
 # 直接安装指定技能
 pnpx skills add snailuu/skill --skill git-exclude
 pnpx skills add snailuu/skill --skill code-review-expert
+pnpx skills add snailuu/skill --skill create-readme
+pnpx skills add snailuu/skill --skill diagram-gen
 pnpx skills add snailuu/skill --skill git-commit-gen
+pnpx skills add snailuu/skill --skill plan-writer
 pnpx skills add snailuu/skill --skill pr-review
 pnpx skills add snailuu/skill --skill skill-writer
 pnpx skills add snailuu/skill --skill smart-plan
+pnpx skills add snailuu/skill --skill ui-brutalist
+pnpx skills add snailuu/skill --skill ui-design-taste
+pnpx skills add snailuu/skill --skill ui-high-end-visual
+pnpx skills add snailuu/skill --skill ui-minimalist
+pnpx skills add snailuu/skill --skill ui-output-enforcement
+pnpx skills add snailuu/skill --skill ui-redesign
+pnpx skills add snailuu/skill --skill ui-stitch-taste
 pnpx skills add snailuu/skill --skill writing-changelogs
 
 # 检查并更新已安装技能
@@ -110,11 +134,9 @@ pnpx skills update
 
 ## Vendored Skills（外部来源）
 
-这里仅记录 `meta.ts` 中 `vendors` 配置的外部来源仓库，不展开列出对方仓库内部的技能清单。
+这里不在 README 中展开外部仓库清单与对方技能列表。
 
-| Vendor | Source |
-|---|---|
-| antfu | [antfu/skills](https://github.com/antfu/skills) |
+- 外部 skills 来源与说明统一查看：https://github.com/snailuu/skill/issues/2
 
 ## 扩展方式（可选）
 
