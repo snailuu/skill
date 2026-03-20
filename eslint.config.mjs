@@ -3,7 +3,7 @@ import antfu from '@antfu/eslint-config'
 export default antfu(
   {
     type: 'lib',
-    ignores: ['.serena', 'dist', 'node_modules', 'skills', 'sources', 'vendor'],
+    ignores: ['.serena', 'dist', 'docs', 'node_modules', 'skills', 'sources', 'vendor'],
   },
   {
     rules: {

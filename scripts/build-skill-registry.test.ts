@@ -7,6 +7,7 @@ import {
   buildSkillTags,
   classifySkill,
   detectRecentChanges,
+  extractTitle,
   parseReadmeManualSkills,
   parseSkillFrontmatter,
   renderMySkillsMarkdown,
@@ -51,6 +52,20 @@ metadata:
 
   assert.equal(parsed.name, 'turborepo')
   assert.equal(parsed.description, 'Turborepo monorepo build system guidance. Use when user configures tasks or pipelines.')
+})
+
+test('extractTitle 在没有一级标题时会回退到 frontmatter name', () => {
+  const title = extractTitle(`---
+name: create-readme
+description: Create a README.md file for the project
+---
+
+## Role
+
+正文
+`)
+
+  assert.equal(title, 'create-readme')
 })
 
 test('detectRecentChanges 能区分新增和更新的 manual skill', () => {

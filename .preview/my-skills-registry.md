@@ -3,8 +3,8 @@
 ## Overview
 - 仓库手写技能索引
 - 安装方式：`pnpx skills add snailuu/skill --skill <name>`
-- 最后更新时间：2026-03-20 10:08:31 UTC
-- Manual skills：7
+- 最后更新时间：2026-03-20 14:29:13 UTC
+- Manual skills：10
 
 ## Manual Skills
 ### Git
@@ -32,6 +32,13 @@
 - 标签：`review`
 - 参考资料：有 `references/`
 
+#### create-readme
+- 标题：create-readme
+- 使用场景：Create a README.md file for the project
+- 路径：`skills/create-readme`
+- 标签：`pr`
+- 参考资料：无
+
 #### pr-review
 - 标题：PR/MR 评论查看与建议技能
 - 使用场景：查看 PR/MR 评论并给出解决建议。当用户提到"查看 PR 评论"、"PR xxx 的评论"、"帮我看 PR"、"review PR"、"MR 评论"、"merge request 评论"等关键词时触发。支持 GitHub 和 GitLab，自动检测平台，优先使用本地 CLI 工具（gh/glab），fallback 到 API。
@@ -40,6 +47,13 @@
 - 参考资料：有 `references/`
 
 ### Planning
+
+#### plan-writer
+- 标题：Plan 模式智能写入技能
+- 使用场景：Plan 模式下智能分批写入计划文件，避免单次写入过大导致失败
+- 路径：`skills/plan-writer`
+- 标签：`planning`、`writing`
+- 参考资料：无
 
 #### smart-plan
 - 标题：Smart Plan - 智能计划生成技能
@@ -66,6 +80,15 @@
 - 标签：`changelog`、`git`、`release`
 - 参考资料：有 `references/`
 
+### Utility
+
+#### diagram-gen
+- 标题：图表生成技能
+- 使用场景：根据用户描述生成各种类型的图表（时序图、流程图、类图、状态图等），使用 Mermaid 语法，支持保存为文件
+- 路径：`skills/diagram-gen`
+- 标签：无
+- 参考资料：无
+
 ## Recent Changes
 - 本次生成未检测到可归类的 registry 变更，可能是手动触发。
 
@@ -74,12 +97,14 @@
 - 全部 manual entries 都有对应目录
 
 ### Skill directories missing from manual
+- skills/ 目录中的技能都已登记到 manual
+
+### README missing manual skills
 - `create-readme`
 - `diagram-gen`
 - `plan-writer`
 
-### README missing manual skills
-- README 手写技能列表已覆盖全部 manual skills
-
 ### README missing install examples
-- README 安装示例已覆盖全部 manual skills
+- `create-readme`
+- `diagram-gen`
+- `plan-writer`

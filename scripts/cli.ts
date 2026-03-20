@@ -1,6 +1,8 @@
+import type { VendorSkillMeta } from '../meta.js'
 import { execSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { basename, dirname, join, resolve } from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
 import { manual, submodules, vendors } from '../meta.js'
@@ -9,6 +11,19 @@ interface Project {
   name: string
   path: string
   type: 'source' | 'vendor'
+  url: string
+}
+
+type SkillImportMode = 'manual' | 'submodules' | 'vendor'
+
+interface SkillImportArgs {
+  mode: SkillImportMode
+  source: string
+}
+
+interface GitHubRepo {
+  owner: string
+  repo: string
   url: string
 }
 
@@ -38,6 +53,340 @@ function execSafe(cmd: string, cwd = root): string | null {
 function ensureDir(path: string): void {
   if (!existsSync(path))
     mkdirSync(path, { recursive: true })
+}
+
+function parseSkillCommandArgs(args: string[]): SkillImportArgs {
+  let mode: SkillImportMode = 'manual'
+  let source = ''
+
+  for (const arg of args) {
+    if (arg === '--vendor') {
+      if (mode !== 'manual')
+        throw new Error('`--vendor` 不能与其他模式同时使用。')
+      mode = 'vendor'
+      continue
+    }
+
+    if (arg === '--submodules') {
+      if (mode !== 'manual')
+        throw new Error('`--submodules` 不能与其他模式同时使用。')
+      mode = 'submodules'
+      continue
+    }
+
+    if (arg.startsWith('--'))
+      throw new Error(`未知选项：${arg}`)
+
+    if (source)
+      throw new Error('`skill` 命令只接受一个来源参数。')
+
+    source = arg
+  }
+
+  if (!source)
+    throw new Error('缺少 skill 来源参数。')
+
+  return { mode, source }
+}
+
+function parseGitHubRepo(source: string): GitHubRepo | null {
+  const normalized = source.trim().replace(/\/+$/, '')
+  const httpsMatch = normalized.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+?)(?:\.git)?$/)
+  if (httpsMatch) {
+    return {
+      owner: httpsMatch[1],
+      repo: httpsMatch[2],
+      url: `https://github.com/${httpsMatch[1]}/${httpsMatch[2]}.git`,
+    }
+  }
+
+  const sshMatch = normalized.match(/^git@github\.com:([^/]+)\/([^/]+?)(?:\.git)?$/)
+  if (sshMatch) {
+    return {
+      owner: sshMatch[1],
+      repo: sshMatch[2],
+      url: `git@github.com:${sshMatch[1]}/${sshMatch[2]}.git`,
+    }
+  }
+
+  return null
+}
+
+function resolveLocalDirectory(input: string): string {
+  const resolvedPath = resolve(process.cwd(), input)
+  if (!existsSync(resolvedPath))
+    throw new Error(`来源不存在：${input}`)
+
+  const realPath = realpathSync(resolvedPath)
+  const stats = statSync(realPath)
+  if (!stats.isDirectory())
+    throw new Error(`来源不是目录：${input}`)
+
+  return realPath
+}
+
+function hasSkillFile(path: string): boolean {
+  return existsSync(join(path, 'SKILL.md'))
+}
+
+function getSkillNameFromDirectory(path: string): string {
+  const skillPath = join(path, 'SKILL.md')
+  const content = readFileSync(skillPath, 'utf8')
+  const nameLine = content
+    .split('\n')
+    .find(line => line.trimStart().startsWith('name:'))
+
+  if (!nameLine)
+    return basename(path)
+
+  return nameLine
+    .slice(nameLine.indexOf(':') + 1)
+    .trim()
+    .replace(/^['"]/, '')
+    .replace(/['"]$/, '')
+}
+
+function scanVendorSkills(path: string): Record<string, string> {
+  const skillsRoot = join(path, 'skills')
+  if (!existsSync(skillsRoot))
+    return {}
+
+  const skillEntries = readdirSync(skillsRoot, { withFileTypes: true })
+    .filter(entry => entry.isDirectory() && hasSkillFile(join(skillsRoot, entry.name)))
+    .map(entry => entry.name)
+    .sort((a, b) => a.localeCompare(b))
+
+  return Object.fromEntries(skillEntries.map(name => [name, name]))
+}
+
+function copyDirectory(source: string, destination: string): void {
+  cpSync(source, destination, {
+    recursive: true,
+    filter: current => !current.split(/[/\\]/).includes('.git'),
+  })
+}
+
+function cloneGitHubRepo(url: string): string {
+  const tmpPath = mkdtempSync(join(tmpdir(), 'skill-import-'))
+  exec(`git clone --depth 1 ${shellQuote(url)} ${shellQuote(tmpPath)}`)
+  return tmpPath
+}
+
+function formatTsString(value: string): string {
+  return `'${value.replace(/\\/g, '\\\\').replace(/'/g, '\\\'')}'`
+}
+
+function formatStringRecord(
+  record: Record<string, string>,
+  indent = '  ',
+  closingIndent = '',
+): string {
+  const entries = Object.entries(record).sort(([left], [right]) => left.localeCompare(right))
+  if (!entries.length)
+    return '{}'
+
+  return `{\n${entries.map(([key, value]) => `${indent}${formatTsString(key)}: ${formatTsString(value)},`).join('\n')}\n${closingIndent}}`
+}
+
+function formatVendorRecord(record: Record<string, VendorSkillMeta>): string {
+  const entries = Object.entries(record).sort(([left], [right]) => left.localeCompare(right))
+  if (!entries.length)
+    return '{}'
+
+  return `{\n${entries.map(([name, config]) => {
+    const lines = [
+      `  ${formatTsString(name)}: {`,
+    ]
+
+    if (config.official)
+      lines.push('    official: true,')
+
+    lines.push(`    source: ${formatTsString(config.source)},`)
+    lines.push(`    skills: ${formatStringRecord(config.skills, '      ', '    ')},`)
+    lines.push('  },')
+    return lines.join('\n')
+  }).join('\n')}\n}`
+}
+
+function writeMetaFile(
+  nextSubmodules: Record<string, string>,
+  nextVendors: Record<string, VendorSkillMeta>,
+  nextManual: string[],
+): void {
+  const content = `export interface VendorSkillMeta {
+  official?: boolean
+  source: string
+  skills: Record<string, string>
+}
+
+/**
+ * 资料仓库：拉取后由你按需整理为 skills
+ */
+export const submodules: Record<string, string> = ${formatStringRecord(nextSubmodules)}
+
+/**
+ * 外部技能来源：直接同步已有 skills
+ */
+export const vendors: Record<string, VendorSkillMeta> = ${formatVendorRecord(nextVendors)}
+
+/**
+ * 本仓库手写技能
+ */
+export const manual = [
+${nextManual
+  .slice()
+  .sort((left, right) => left.localeCompare(right))
+  .map(name => `  ${formatTsString(name)},`)
+  .join('\n')}
+] as const
+`
+
+  writeFileSync(join(root, 'meta.ts'), content, 'utf8')
+}
+
+function assertAvailableName(name: string, mode: SkillImportMode): void {
+  const manualNames = new Set<string>(manual)
+  const vendorNames = new Set(Object.keys(vendors))
+  const submoduleNames = new Set(Object.keys(submodules))
+
+  if (manualNames.has(name) || vendorNames.has(name) || submoduleNames.has(name))
+    throw new Error(`名称冲突：${name} 已存在于 meta.ts`)
+
+  if (mode === 'manual' && existsSync(join(root, 'skills', name)))
+    throw new Error(`名称冲突：skills/${name} 已存在。`)
+
+  if (mode === 'vendor' && existsSync(join(root, 'vendor', name)))
+    throw new Error(`名称冲突：vendor/${name} 已存在。`)
+
+  if (mode === 'submodules' && existsSync(join(root, 'sources', name)))
+    throw new Error(`名称冲突：sources/${name} 已存在。`)
+}
+
+function importManualSkill(source: string): void {
+  const githubRepo = parseGitHubRepo(source)
+  let cleanupPath = ''
+  let sourcePath = source
+
+  try {
+    if (githubRepo) {
+      cleanupPath = cloneGitHubRepo(githubRepo.url)
+      sourcePath = cleanupPath
+    }
+
+    const localPath = githubRepo ? sourcePath : resolveLocalDirectory(sourcePath)
+    if (!hasSkillFile(localPath))
+      throw new Error('默认模式仅支持包含 SKILL.md 的单技能目录。')
+
+    const skillName = getSkillNameFromDirectory(localPath)
+    assertAvailableName(skillName, 'manual')
+
+    ensureDir(join(root, 'skills'))
+    copyDirectory(localPath, join(root, 'skills', skillName))
+
+    writeMetaFile(
+      { ...submodules },
+      Object.fromEntries(Object.entries(vendors).map(([name, config]) => [name, { ...config, skills: { ...config.skills } }])),
+      [...manual, skillName],
+    )
+
+    console.log(`已导入技能：${skillName} -> skills/${skillName}`)
+  }
+  finally {
+    if (cleanupPath)
+      rmSync(cleanupPath, { recursive: true, force: true })
+  }
+}
+
+function importVendorSource(source: string): void {
+  const githubRepo = parseGitHubRepo(source)
+  let cleanupPath = ''
+  let localPath = ''
+  let sourceLabel = source
+  let vendorName = ''
+
+  try {
+    if (githubRepo) {
+      cleanupPath = cloneGitHubRepo(githubRepo.url)
+      localPath = cleanupPath
+      sourceLabel = githubRepo.url
+      vendorName = githubRepo.repo
+    }
+    else {
+      localPath = resolveLocalDirectory(source)
+      sourceLabel = localPath
+      vendorName = basename(localPath)
+    }
+
+    assertAvailableName(vendorName, 'vendor')
+
+    const destination = join(root, 'vendor', vendorName)
+    ensureDir(join(root, 'vendor'))
+
+    if (hasSkillFile(localPath)) {
+      const skillName = getSkillNameFromDirectory(localPath)
+      ensureDir(join(destination, 'skills'))
+      copyDirectory(localPath, join(destination, 'skills', skillName))
+    }
+    else {
+      copyDirectory(localPath, destination)
+    }
+
+    const nextVendors = Object.fromEntries(
+      Object.entries(vendors).map(([name, config]) => [name, { ...config, skills: { ...config.skills } }]),
+    )
+    nextVendors[vendorName] = {
+      source: sourceLabel,
+      skills: scanVendorSkills(destination),
+    }
+
+    writeMetaFile(
+      { ...submodules },
+      nextVendors,
+      [...manual],
+    )
+
+    console.log(`已登记 vendor：${vendorName} -> vendor/${vendorName}`)
+  }
+  finally {
+    if (cleanupPath)
+      rmSync(cleanupPath, { recursive: true, force: true })
+  }
+}
+
+function importSubmoduleSource(source: string): void {
+  const githubRepo = parseGitHubRepo(source)
+  if (!githubRepo)
+    throw new Error('`--submodules` 仅支持 GitHub 仓库地址。')
+
+  assertAvailableName(githubRepo.repo, 'submodules')
+  ensureDir(join(root, 'sources'))
+  exec(`git submodule add ${shellQuote(githubRepo.url)} ${shellQuote(`sources/${githubRepo.repo}`)}`)
+
+  writeMetaFile(
+    {
+      ...submodules,
+      [githubRepo.repo]: githubRepo.url,
+    },
+    Object.fromEntries(Object.entries(vendors).map(([name, config]) => [name, { ...config, skills: { ...config.skills } }])),
+    [...manual],
+  )
+
+  console.log(`已添加资料子模块：sources/${githubRepo.repo}`)
+}
+
+function importSkill(args: string[]): void {
+  const parsed = parseSkillCommandArgs(args)
+  switch (parsed.mode) {
+    case 'manual':
+      importManualSkill(parsed.source)
+      break
+    case 'vendor':
+      importVendorSource(parsed.source)
+      break
+    case 'submodules':
+      importSubmoduleSource(parsed.source)
+      break
+  }
 }
 
 function getAllProjects(): Project[] {
@@ -119,6 +468,11 @@ function initSubmodules(): void {
   for (const project of projects) {
     if (existingPaths.has(project.path)) {
       console.log(`已存在，跳过：${project.path}`)
+      continue
+    }
+
+    if (existsSync(join(root, project.path))) {
+      console.log(`目录已存在，跳过子模块初始化：${project.path}`)
       continue
     }
 
@@ -233,6 +587,7 @@ function printHelp(): void {
 
 用法：
   pnpm start:init
+  pnpm skill <source> [--vendor | --submodules]
   tsx scripts/cli.ts sync
   pnpm start:check
   pnpm start:cleanup
@@ -240,30 +595,44 @@ function printHelp(): void {
 }
 
 function main(): void {
-  const [, , command] = process.argv
+  const [, , command, ...args] = process.argv
 
-  switch (command) {
-    case 'init':
-      initSubmodules()
-      break
-    case 'sync':
-      syncSubmodules()
-      break
-    case 'check':
-      checkUpdates()
-      break
-    case 'cleanup':
-      cleanup()
-      break
-    default:
-      if (command) {
-        console.error(`未知命令：${command}`)
-        printHelp()
-        process.exit(1)
-      }
-      else {
-        printHelp()
-      }
+  try {
+    switch (command) {
+      case 'init':
+        initSubmodules()
+        break
+      case 'skill':
+        importSkill(args)
+        break
+      case 'sync':
+        syncSubmodules()
+        break
+      case 'check':
+        checkUpdates()
+        break
+      case 'cleanup':
+        cleanup()
+        break
+      default:
+        if (command) {
+          throw new Error(`未知命令：${command}`)
+        }
+        else {
+          printHelp()
+        }
+    }
+  }
+  catch (error) {
+    if (error instanceof Error)
+      console.error(error.message)
+    else
+      console.error(String(error))
+
+    if (command === 'skill')
+      printHelp()
+
+    process.exit(1)
   }
 }
 

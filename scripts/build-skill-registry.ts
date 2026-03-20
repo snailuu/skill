@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer'
 import { execSync } from 'node:child_process'
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -167,7 +168,7 @@ async function translateOne(
   description: string,
   config: AIConfig,
 ): Promise<string | null> {
-  const endpoint = config.baseUrl.replace(/\/+$/, '') + '/chat/completions'
+  const endpoint = `${config.baseUrl.replace(/\/+$/, '')}/chat/completions`
 
   try {
     const response = await fetch(endpoint, {
@@ -322,12 +323,20 @@ export function buildSkillTags(input: { description: string, name: string, title
   return [...tags].sort()
 }
 
-function extractTitle(content: string): string {
+export function extractTitle(content: string, fallbackTitle?: string): string {
   const titleLine = content
     .split('\n')
     .find(line => line.startsWith('# '))
 
-  return titleLine?.slice(2).trim() || '未命名技能'
+  if (titleLine)
+    return titleLine.slice(2).trim()
+
+  try {
+    return parseSkillFrontmatter(content).name || fallbackTitle || '未命名技能'
+  }
+  catch {
+    return fallbackTitle || '未命名技能'
+  }
 }
 
 function stripWrappingQuotes(value: string): string {
@@ -420,7 +429,7 @@ function getManualSkillSummary(name: string): ManualSkillSummary {
   const skillFile = join(skillPath, 'SKILL.md')
   const content = readFile(skillFile)
   const { description } = parseSkillFrontmatter(content)
-  const title = extractTitle(content)
+  const title = extractTitle(content, name)
   const input = { name, title, description }
 
   return {

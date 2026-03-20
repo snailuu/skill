@@ -7,21 +7,18 @@ export interface VendorSkillMeta {
 /**
  * 资料仓库：拉取后由你按需整理为 skills
  */
-export const submodules: Record<string, string> = {
-  // 示例：
-  // vue: 'https://github.com/vuejs/docs',
-}
+export const submodules: Record<string, string> = {}
 
 /**
  * 外部技能来源：直接同步已有 skills
  */
 export const vendors: Record<string, VendorSkillMeta> = {
-  antfu: {
+  'antfu': {
     official: true,
     source: 'https://github.com/antfu/skills',
     skills: {},
   },
-  baoyu: {
+  'baoyu': {
     source: 'https://github.com/JimLiu/baoyu-skills',
     skills: {},
   },
@@ -32,8 +29,11 @@ export const vendors: Record<string, VendorSkillMeta> = {
  */
 export const manual = [
   'code-review-expert',
+  'create-readme',
+  'diagram-gen',
   'git-commit-gen',
   'git-exclude',
+  'plan-writer',
   'pr-review',
   'skill-writer',
   'smart-plan',
