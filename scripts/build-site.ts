@@ -7,7 +7,8 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import process from 'node:process'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 import { manual, vendors } from '../meta.js'
 import { fetchVendorSkills } from './build-skill-registry.js'
 
@@ -22,6 +23,11 @@ interface SkillItem {
 
 interface SkillSection {
   items: SkillItem[]
+  title: string
+}
+
+interface ManualSkillTranslation {
+  description: string
   title: string
 }
 
@@ -160,6 +166,28 @@ function getIcon(name: string): string {
 // 本仓库 GitHub 地址
 const repoUrl = 'https://github.com/snailuu/skill'
 
+export function parseManualSkillTranslations(content: string): Map<string, ManualSkillTranslation> {
+  const map = new Map<string, ManualSkillTranslation>()
+  const blocks = content.split('\n#### ').slice(1)
+
+  for (const block of blocks) {
+    const lines = block.split('\n')
+    const name = lines[0]?.trim()
+    const titleLine = lines.find(line => line.startsWith('- 标题：'))
+    const descriptionLine = lines.find(line => line.startsWith('- 使用场景：'))
+
+    if (!name || !descriptionLine)
+      continue
+
+    map.set(name, {
+      title: titleLine?.slice('- 标题：'.length).trim() || name,
+      description: descriptionLine.slice('- 使用场景：'.length).trim(),
+    })
+  }
+
+  return map
+}
+
 /**
  * 从 .preview/other-skills-registry.md 解析翻译后的描述
  * 表格格式: | `name` | description |
@@ -183,23 +211,50 @@ function loadTranslatedDescriptions(): Map<string, string> {
 
 // 翻译描述缓存
 const translatedDescs = loadTranslatedDescriptions()
+const translatedManualTexts = (() => {
+  const filePath = join(root, '.preview', 'my-skills-registry.md')
+  if (!existsSync(filePath))
+    return new Map<string, ManualSkillTranslation>()
+
+  return parseManualSkillTranslations(readFileSync(filePath, 'utf8'))
+})()
+
+export function buildManualSkillItem(options: {
+  name: string
+  repoUrl: string
+  rootDir: string
+  translations?: Map<string, ManualSkillTranslation>
+}): SkillItem {
+  const skillFile = join(options.rootDir, 'skills', options.name, 'SKILL.md')
+  if (!existsSync(skillFile)) {
+    return {
+      name: options.name,
+      description: '',
+      icon: getIcon(options.name),
+      link: `${options.repoUrl}/tree/main/skills/${options.name}`,
+    }
+  }
+
+  const content = readFileSync(skillFile, 'utf8')
+  const parsed = parseFrontmatter(content)
+  const translated = options.translations?.get(options.name)
+
+  return {
+    name: parsed.name || options.name,
+    description: translated?.description || shortenDescription(parsed.description),
+    icon: getIcon(options.name),
+    link: `${options.repoUrl}/tree/main/skills/${options.name}`,
+  }
+}
 
 // 收集本仓库手写技能
 function collectManualSkills(): SkillItem[] {
-  return manual.map((name) => {
-    const skillFile = join(root, 'skills', name, 'SKILL.md')
-    if (!existsSync(skillFile))
-      return { name, description: '', icon: getIcon(name), link: `${repoUrl}/tree/main/skills/${name}` }
-
-    const content = readFileSync(skillFile, 'utf8')
-    const parsed = parseFrontmatter(content)
-    return {
-      name: parsed.name || name,
-      description: shortenDescription(parsed.description),
-      icon: getIcon(name),
-      link: `${repoUrl}/tree/main/skills/${name}`,
-    }
-  })
+  return manual.map(name => buildManualSkillItem({
+    name,
+    repoUrl,
+    rootDir: root,
+    translations: translatedManualTexts,
+  }))
 }
 
 // 收集 vendor 技能（通过 gh api 远程获取，优先使用 .preview/ 中的翻译描述）
@@ -506,4 +561,5 @@ function main(): void {
   console.log(`站点已生成：dist/index.html（${sections.reduce((s, sec) => s + sec.items.length, 0)} 个技能）`)
 }
 
-main()
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
+  main()
