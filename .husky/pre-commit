@@ -8,7 +8,20 @@ if [ -z "$CHANGED" ]; then
 fi
 
 echo "检测到 skills 相关变更，生成 .preview/ ..."
-pnpm registry:preview --summarize
+
+if (
+  [ -n "${AI_BASE_URL:-}" ] && [ -n "${AI_API_KEY:-}" ] && [ -n "${AI_MODEL:-}" ]
+) || (
+  [ -f ".env" ] \
+  && grep -q '^AI_BASE_URL=' ".env" \
+  && grep -q '^AI_API_KEY=' ".env" \
+  && grep -q '^AI_MODEL=' ".env"
+); then
+  pnpm registry:preview --summarize
+else
+  echo "未检测到 AI 配置，改为生成未翻译的 .preview/ 文本"
+  pnpm registry:preview
+fi
 
 # 将生成的文件加入暂存区，随本次 commit 一起提交
 git add .preview/
