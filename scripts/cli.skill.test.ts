@@ -9,7 +9,7 @@ import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..')
-const tsxBin = join(repoRoot, 'node_modules', '.bin', 'tsx')
+const tsxLoader = join(repoRoot, 'node_modules', 'tsx', 'dist', 'loader.mjs')
 
 function createFixtureProject(): string {
   const projectDir = mkdtempSync(join(tmpdir(), 'skill-cli-'))
@@ -87,7 +87,7 @@ exit 1
 }
 
 function runCli(projectDir: string, args: string[], env: NodeJS.ProcessEnv = {}) {
-  return spawnSync(tsxBin, [join(projectDir, 'scripts', 'cli.ts'), ...args], {
+  return spawnSync(process.execPath, ['--import', tsxLoader, join(projectDir, 'scripts', 'cli.ts'), ...args], {
     cwd: projectDir,
     encoding: 'utf8',
     env: {
@@ -110,6 +110,26 @@ test('默认模式会把本地技能目录导入 skills 并更新 manual', () =>
 
   const metaContent = readFileSync(join(projectDir, 'meta.ts'), 'utf8')
   assert.match(metaContent, /'demo-skill'/)
+})
+
+test('默认模式会把 SKILL.md 中的 PascalCase 名称转换为 kebab-case', () => {
+  const projectDir = createFixtureProject()
+  const sourceRoot = join(projectDir, 'external')
+  const sourceSkillDir = join(sourceRoot, 'CreateCLI')
+  mkdirSync(sourceSkillDir, { recursive: true })
+  writeFileSync(join(sourceSkillDir, 'SKILL.md'), `---
+name: CreateCLI
+description: 测试技能
+---
+`, 'utf8')
+
+  const result = runCli(projectDir, ['skill', sourceSkillDir])
+
+  assert.equal(result.status, 0)
+  assert.equal(existsSync(join(projectDir, 'skills', 'create-cli', 'SKILL.md')), true)
+
+  const metaContent = readFileSync(join(projectDir, 'meta.ts'), 'utf8')
+  assert.match(metaContent, /'create-cli'/)
 })
 
 test('默认模式会解析软链接并复制真实技能目录', () => {

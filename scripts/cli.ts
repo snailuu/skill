@@ -129,6 +129,17 @@ function hasSkillFile(path: string): boolean {
   return existsSync(join(path, 'SKILL.md'))
 }
 
+function toKebabCase(value: string): string {
+  return value
+    .trim()
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .toLowerCase()
+}
+
 function getSkillNameFromDirectory(path: string): string {
   const skillPath = join(path, 'SKILL.md')
   const content = readFileSync(skillPath, 'utf8')
@@ -136,14 +147,15 @@ function getSkillNameFromDirectory(path: string): string {
     .split('\n')
     .find(line => line.trimStart().startsWith('name:'))
 
-  if (!nameLine)
-    return basename(path)
+  const rawName = nameLine
+    ? nameLine
+        .slice(nameLine.indexOf(':') + 1)
+        .trim()
+        .replace(/^['"]/, '')
+        .replace(/['"]$/, '')
+    : basename(path)
 
-  return nameLine
-    .slice(nameLine.indexOf(':') + 1)
-    .trim()
-    .replace(/^['"]/, '')
-    .replace(/['"]$/, '')
+  return toKebabCase(rawName)
 }
 
 function scanVendorSkills(path: string): Record<string, string> {

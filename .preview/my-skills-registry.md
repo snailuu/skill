@@ -3,8 +3,8 @@
 ## Overview
 - 仓库手写技能索引
 - 安装方式：`pnpx skills add snailuu/skill --skill <name>`
-- 最后更新时间：2026-03-23 00:44:18 UTC
-- Manual skills：18
+- 最后更新时间：2026-03-23 06:05:08 UTC
+- Manual skills：19
 
 ## Manual Skills
 ### Git
@@ -26,7 +26,7 @@
 ### Review
 
 #### code-review-expert
-- 标题：代码审查专家
+- 标题：Code Review Expert
 - 使用场景：Expert code review with a senior engineer lens. 当用户说"代码审查"、"review 代码"、"code review"、"审查变更"、"检查代码质量"时触发。不适用于：编写新代码、修复 bug、重构等开发操作。
 - 路径：`skills/code-review-expert`
 - 标签：`review`
@@ -67,15 +67,15 @@
 ### Workflow
 
 #### ui-high-end-visual
-- 标题：代理技能：首席 UI/UX 架构师兼动态编排师（Awwwards 级别）
-- 使用场景：教会 AI 像高端设计机构一样进行设计。精确定义字体、间距、阴影、卡片结构和动画等细节，让网站呈现出高级、昂贵的质感。同时避免所有那些会让 AI 设计显得廉价或千篇一律的常见默认样式。
+- 标题：Agent Skill: Principal UI/UX Architect & Motion Choreographer (Awwwards-Tier)
+- 使用场景：Teaches the AI to design like a high-end agency. Defines the exact fonts, spacing, shadows, card structures, and animations that make a website feel expensive. Blocks all the common defaults that make AI designs look cheap or generic.
 - 路径：`skills/ui-high-end-visual`
 - 标签：`workflow`
 - 参考资料：无
 
 #### ui-stitch-taste
 - 标题：Stitch Design Taste — Semantic Design System Skill
-- 使用场景：用于 Google Stitch 的语义化设计系统技能。可生成适合代理使用的 DESIGN.md 文件，强制执行高端、反模板化的 UI 标准——严格的字体排印、经过校准的色彩、不对称布局、持续的微交互动效，以及硬件加速性能。
+- 使用场景：Semantic Design System Skill for Google Stitch. Generates agent-friendly DESIGN.md files that enforce premium, anti-generic UI standards — strict typography, calibrated color, asymmetric layouts, perpetual micro-motion, and hardware-accelerated performance.
 - 路径：`skills/ui-stitch-taste`
 - 标签：`workflow`
 - 参考资料：无
@@ -93,14 +93,21 @@
 
 #### cli-design-framework
 - 标题：CLI Design Framework
-- 使用场景：在设计新的 CLI、审查现有 CLI，或在 CLI 的角色、用户类型、交互形式、有状态性、风险特征以及面向人类还是机器的使用界面存在不确定性时使用。
+- 使用场景：Use when designing a new CLI, reviewing an existing CLI, or resolving uncertainty about a CLI's role, user type, interaction form, statefulness, risk profile, or human-vs-machine surfaces.
 - 路径：`skills/cli-design-framework`
 - 标签：无
 - 参考资料：有 `references/`
 
+#### create-cli
+- 标题：CreateCLI
+- 使用场景：Generate TypeScript CLIs. USE WHEN create CLI, build CLI, command-line tool. SkillSearch('createcli') for docs.
+- 路径：`skills/create-cli`
+- 标签：无
+- 参考资料：无
+
 #### create-readme
-- 标题：create-readme
-- 使用场景：为该项目创建一个 README.md 文件。
+- 标题：创建 README 文件
+- 使用场景：Create a README.md file for the project
 - 路径：`skills/create-readme`
 - 标签：无
 - 参考资料：无
@@ -114,35 +121,35 @@
 
 #### ui-brutalist
 - 标题：SKILL: Industrial Brutalism & Tactical Telemetry UI
-- 使用场景：原始机械感界面，将瑞士风格的印刷排版与军用终端美学融为一体。采用严格的网格系统、极端的字号对比、功能主义色彩，以及模拟信号式的老化损耗效果。非常适合用于数据密集型仪表板、作品集或编辑类网站，营造出一种如同“解密蓝图”般的视觉感受。
+- 使用场景：Raw mechanical interfaces fusing Swiss typographic print with military terminal aesthetics. Rigid grids, extreme type scale contrast, utilitarian color, analog degradation effects. For data-heavy dashboards, portfolios, or editorial sites that need to feel like declassified blueprints.
 - 路径：`skills/ui-brutalist`
 - 标签：无
 - 参考资料：无
 
 #### ui-design-taste
 - 标题：High-Agency Frontend Skill
-- 使用场景：高级 UI/UX 工程师。负责构建能够覆盖默认大语言模型偏差的数字界面。强调基于指标的规则、严格的组件架构、CSS 硬件加速以及兼顾美学与工程实现的平衡式设计。
+- 使用场景：Senior UI/UX Engineer. Architect digital interfaces overriding default LLM biases. Enforces metric-based rules, strict component architecture, CSS hardware acceleration, and balanced design engineering.
 - 路径：`skills/ui-design-taste`
 - 标签：无
 - 参考资料：无
 
 #### ui-minimalist
 - 标题：Protocol: Premium Utilitarian Minimalism UI Architect
-- 使用场景：干净的编辑风格界面。温暖的单色调色板、富有对比的字体排版、扁平化的 Bento 网格、柔和的粉彩色。不要渐变，不要厚重阴影。
+- 使用场景：Clean editorial-style interfaces. Warm monochrome palette, typographic contrast, flat bento grids, muted pastels. No gradients, no heavy shadows.
 - 路径：`skills/ui-minimalist`
 - 标签：无
 - 参考资料：无
 
 #### ui-output-enforcement
 - 标题：Full-Output Enforcement
-- 使用场景：覆盖默认的 LLM 截断行为。强制生成完整代码，禁止使用占位符模式，并妥善处理因令牌限制导致的分段输出。适用于任何需要详尽、未删节输出的任务。
+- 使用场景：Overrides default LLM truncation behavior. Enforces complete code generation, bans placeholder patterns, and handles token-limit splits cleanly. Apply to any task requiring exhaustive, unabridged output.
 - 路径：`skills/ui-output-enforcement`
 - 标签：无
 - 参考资料：无
 
 #### ui-redesign
 - 标题：Redesign Skill
-- 使用场景：将现有网站和应用升级为高端品质。审查当前设计，识别通用的 AI 风格模式，并在不破坏功能的前提下应用高端设计标准。兼容任何 CSS 框架或原生 CSS。
+- 使用场景：Upgrades existing websites and apps to premium quality. Audits current design, identifies generic AI patterns, and applies high-end design standards without breaking functionality. Works with any CSS framework or vanilla CSS.
 - 路径：`skills/ui-redesign`
 - 标签：无
 - 参考资料：无
@@ -159,6 +166,8 @@
 
 ### README missing manual skills
 - `cli-design-framework`
+- `create-cli`
 
 ### README missing install examples
 - `cli-design-framework`
+- `create-cli`

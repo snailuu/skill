@@ -30,6 +30,7 @@ export const vendors: Record<string, VendorSkillMeta> = {
 export const manual = [
   'cli-design-framework',
   'code-review-expert',
+  'create-cli',
   'create-readme',
   'diagram-gen',
   'git-commit-gen',

@@ -2,7 +2,7 @@
 
 ## Overview
 - 外部技能来源与资料仓库索引
-- 最后更新时间：2026-03-23 00:44:18 UTC
+- 最后更新时间：2026-03-23 06:05:08 UTC
 - Vendor sources：2
 - 外部技能总数：36
 - Submodule sources：0
@@ -19,23 +19,23 @@
 
 | 技能名称 | 说明 |
 |---|---|
-| `antfu` | Anthony Fu 为 JavaScript/TypeScript 项目提出的一套带有明确个人偏好的工具链与约定。适用于搭建新项目、配置 ESLint/Prettier 的替代方案、管理 monorepo、发布库，或当用户提到 Anthony Fu 的偏好时使用。 |
-| `nuxt` | Nuxt 是一个全栈 Vue 框架，支持 SSR（服务端渲染）、自动导入和基于文件的路由。处理 Nuxt 应用、服务器路由、useFetch、中间件或混合渲染时，请使用它。 |
-| `pinia` | Pinia 是 Vue 官方的状态管理库，类型安全且具有良好的可扩展性。可在定义 store、使用 state/getters/actions，或在 Vue 应用中实现 store 模式时使用。 |
-| `pnpm` | 具有严格依赖解析的 Node.js 包管理器。用于运行 pnpm 特定命令、配置工作区，或通过 catalogs、patches 或 overrides 管理依赖项。 |
-| `slidev` | 使用 Slidev 为开发者创建并展示基于 Web 的幻灯片演示，支持 Markdown、Vue 组件、代码高亮、动画和交互功能。适用于构建技术演示、会议演讲、代码讲解、教学材料或面向开发者的演示文稿。 |
-| `tsdown` | 使用 Rolldown 提供的极速能力来打包 TypeScript 和 JavaScript 库。适用于构建库、生成类型声明、打包为多种格式，或从 tsup 迁移时使用。 |
-| `turborepo` | Turborepo 单体仓库（monorepo）构建系统指南。适用于以下内容：turbo.json、任务流水线（task pipelines）、dependsOn、缓存、远程缓存、`turbo` 命令行工具、`--filter`、`--affected`、CI 优化、环境变量、内部包、monorepo 结构/最佳实践以及边界约束。 当用户有以下需求时可使用： - 配置任务、工作流或流水线 - 创建包 - 搭建 monorepo - 在多个应用之间共享代码 - 运行已更改/受影响的包 - 调试缓存 - 拥有 `apps/` 或 `packages/` 目录结构 |
-| `unocss` | UnoCSS 是一个即时原子化 CSS 引擎，也是 Tailwind CSS 的超集。可在配置 UnoCSS、编写工具类规则、快捷方式（shortcuts），或使用 Wind、Icons、Attributify 等预设时使用。 |
-| `vite` | Vite 构建工具配置、插件 API、SSR，以及 Vite 8 Rolldown 迁移。适用于处理 Vite 项目、`vite.config.ts`、Vite 插件，或使用 Vite 构建类库 / SSR 应用时。 |
-| `vitepress` | VitePress 是一个由 Vite 和 Vue 驱动的静态网站生成器。适用于构建文档网站、配置主题，或在 Markdown 中编写 Vue 组件。 |
-| `vitest` | Vitest 是一个由 Vite 驱动的快速单元测试框架，并提供与 Jest 兼容的 API。适用于编写测试、创建模拟（mock）、配置覆盖率，以及处理测试过滤和测试夹具（fixtures）等场景。 |
-| `vue` | Vue 3 组合式 API、`script setup` 宏、响应式系统以及内置组件。适用于编写 Vue 单文件组件（SFC）、使用 `defineProps` / `defineEmits` / `defineModel`、侦听器（watchers），或使用 `Transition` / `Teleport` / `Suspense` / `KeepAlive` 时。 |
-| `vue-best-practices` | 必须用于 Vue.js 相关任务。强烈推荐将 Composition API 与 `<script setup>` 和 TypeScript 作为标准方案。涵盖 Vue 3、SSR、Volar、vue-tsc。对于任何 Vue、`.vue` 文件、Vue Router、Pinia，或使用 Vue 的 Vite 项目，都应加载。除非项目明确要求使用 Options API，否则始终使用 Composition API。 |
+| `antfu` | Anthony Fu's opinionated tooling and conventions for JavaScript/TypeScript projects. Use when setting up new projects, configuring ESLint/Prettier alternatives, monorepos, library publishing, or when the user mentions Anthony Fu's preferences. |
+| `nuxt` | Nuxt 是一个支持 SSR、自动导入和基于文件路由的全栈 Vue 框架。处理 Nuxt 应用、服务端路由、useFetch、中间件或混合渲染时可使用它。 |
+| `pinia` | Pinia official Vue state management library, type-safe and extensible. Use when defining stores, working with state/getters/actions, or implementing store patterns in Vue apps. |
+| `pnpm` | Node.js 的包管理器，具有严格的依赖解析机制。用于运行 pnpm 特定命令、配置工作区，或通过 catalogs、patches 或 overrides 管理依赖。 |
+| `slidev` | 使用 Slidev，结合 Markdown、Vue 组件、代码高亮、动画和交互功能，为开发者创建并展示基于 Web 的幻灯片。适用于制作技术演示、会议演讲、代码讲解、教学材料或面向开发者的演示文稿。 |
+| `tsdown` | 使用 Rolldown 以极快速度打包 TypeScript 和 JavaScript 库。适用于构建库、生成类型声明、打包多种格式，或从 tsup 迁移。 |
+| `turborepo` | Turborepo monorepo build system guidance. Triggers on: turbo.json, task pipelines, dependsOn, caching, remote cache, the "turbo" CLI, --filter, --affected, CI optimization, environment variables, internal packages, monorepo structure/best practices, and boundaries. Use when user: configures tasks/workflows/pipelines, creates packages, sets up monorepo, shares code between apps, runs changed/affected packages, debugs cache, or has apps/packages directories. |
+| `unocss` | UnoCSS 是一个即时原子化 CSS 引擎，也是 Tailwind CSS 的超集。可在配置 UnoCSS、编写工具类规则、快捷方式，或使用 Wind、Icons、Attributify 等预设时使用。 |
+| `vite` | Vite 构建工具配置、插件 API、SSR，以及迁移到 Vite 8 Rolldown。适用于处理 Vite 项目、vite.config.ts、Vite 插件，或使用 Vite 构建库和 SSR 应用时。 |
+| `vitepress` | 由 Vite 和 Vue 驱动的 VitePress 静态站点生成器。适用于构建文档网站、配置主题，或在 Markdown 中编写 Vue 组件。 |
+| `vitest` | Vitest 是一个由 Vite 驱动的快速单元测试框架，并提供与 Jest 兼容的 API。适用于编写测试、创建模拟、配置覆盖率，以及使用测试过滤和夹具时。 |
+| `vue` | Vue 3 组合式 API、script setup 宏、响应式系统以及内置组件。编写 Vue 单文件组件（SFC）、使用 defineProps/defineEmits/defineModel、侦听器，或使用 Transition/Teleport/Suspense/KeepAlive 时适用。 |
+| `vue-best-practices` | 必须用于 Vue.js 相关任务。强烈建议将 Composition API、`<script setup>` 和 TypeScript 作为标准方案，涵盖 Vue 3、SSR、Volar、vue-tsc；凡是涉及 Vue、.vue 文件、Vue Router、Pinia 或基于 Vite 的 Vue 开发都应启用，除非项目明确要求 Options API，否则始终使用 Composition API。 |
 | `vue-router-best-practices` | Vue Router 4 的模式、导航守卫、路由参数，以及路由与组件生命周期之间的交互。 |
-| `vue-testing-best-practices` | 用于 Vue.js 测试。涵盖 Vitest、Vue Test Utils、组件测试、模拟（mocking）、测试模式，以及用于端到端测试的 Playwright。 |
-| `vueuse-functions` | 在适当的情况下使用 VueUse 组合式函数（composables），以构建简洁且易于维护的 Vue.js / Nuxt 功能。 |
-| `web-design-guidelines` | 审查 UI 代码是否符合 Web 界面指南。适用于用户要求“审查我的 UI”“检查可访问性”“审计设计”“评估用户体验”或“检查我的网站是否符合最佳实践”时。 |
+| `vue-testing-best-practices` | Use for Vue.js testing. Covers Vitest, Vue Test Utils, component testing, mocking, testing patterns, and Playwright for E2E testing. |
+| `vueuse-functions` | 在合适的场景中使用 VueUse 组合式函数来构建简洁、易维护的 Vue.js / Nuxt 功能。 |
+| `web-design-guidelines` | Review UI code for Web Interface Guidelines compliance. Use when asked to "review my UI", "check accessibility", "audit design", "review UX", or "check my site against best practices". |
 
 ### baoyu
 - Source：https://github.com/JimLiu/baoyu-skills
@@ -44,25 +44,25 @@
 
 | 技能名称 | 说明 |
 |---|---|
-| `baoyu-article-illustrator` | 分析文章结构，识别需要视觉辅助的位置，并采用“类型 × 风格”的二维方法生成插图。适用于用户提出“为文章配图”“添加图片”“为文章生成图片”或 “illustrate article”等请求时。 |
-| `baoyu-comic` | 支持多种艺术风格和语调的知识漫画创作者。可创作原创教育漫画，提供详细的分镜布局和按顺序生成图像的能力。适用于用户要求创作“知识漫画”、“教育漫画”、“传记漫画”、“教程漫画”或“Logicomix 风格漫画”时。 |
-| `baoyu-compress-image` | 将图像压缩为 WebP（默认）或 PNG，并自动选择合适的工具。当用户要求“压缩图片”“优化图片”“转换为 WebP”或减小图片文件大小时使用。 |
-| `baoyu-cover-image` | 生成文章封面图片，包含 5 个维度（类型、配色方案、渲染方式、文字、氛围），可组合 10 种颜色方案和 7 种渲染风格。支持电影宽银幕（2.35:1）、宽屏（16:9）和方形（1:1）比例。当用户要求“生成封面图片”、“创建文章封面”或“制作封面”时使用。 |
-| `baoyu-danger-gemini-web` | 通过逆向工程的 Gemini Web API 生成图像和文本。支持文本生成、根据提示词生成图像、使用参考图像作为视觉输入，以及多轮对话。当其他技能需要图像生成后端时，或当用户请求“使用 Gemini 生成图像”“Gemini 文本生成”，或需要具备视觉能力的 AI 生成功能时，可使用此功能。 |
-| `baoyu-danger-x-to-markdown` | 将 X（Twitter）的推文和文章转换为带有 YAML front matter 的 Markdown。使用通过逆向工程获得的 API，并需要用户授权。当用户提到 “X 转 Markdown”、“推文转 Markdown”、“保存推文”，或提供用于转换的 x.com/twitter.com 链接时使用。 |
-| `baoyu-format-markdown` | 对纯文本或 Markdown 文件进行格式化，支持 frontmatter、标题、摘要、各级标题、加粗、列表和代码块。   当用户要求“格式化 markdown”“美化文章”“添加格式”或改进文章排版时使用。   输出文件为 `{filename}-formatted.md`。 |
-| `baoyu-image-gen` | 使用 OpenAI、Google、OpenRouter、DashScope、即梦、Seedream 和 Replicate API 进行 AI 图像生成。支持文生图、参考图、宽高比设置，以及从已保存的提示词文件中批量生成。默认采用顺序生成；当用户已经有多个提示词，或希望获得稳定的多图生成吞吐量时，可使用批量并行生成。当用户要求生成、创建或绘制图像时使用。 |
-| `baoyu-infographic` | 生成专业信息图，提供 21 种版式类型和 20 种视觉风格。可分析内容、推荐版式与风格的组合，并生成可直接用于发布的信息图。适用于用户提出创建 “infographic”、“信息图”、“visual summary”、“可视化” 或 “高密度信息大图” 的需求时。 |
-| `baoyu-markdown-to-html` | 将 Markdown 转换为带样式的 HTML，并提供兼容微信的主题。支持代码高亮、数学公式、PlantUML、脚注、提示框、信息图，以及可选的将外部链接转换为底部引用。适用于用户提出“markdown to html”“convert md to html”“md 转 html”“微信外链转底部引用”等需求，或需要将 Markdown 生成带样式 HTML 输出的场景。 |
-| `baoyu-post-to-wechat` | 通过 API 或 Chrome CDP 将内容发布到微信公众号。支持发布文章（文章），输入格式可为 HTML、Markdown 或纯文本；也支持发布贴图（原“图文”），可包含多张图片。 在 Markdown 文章工作流中，默认会将普通外部链接转换为文末引用，以生成更适合微信公众号的输出。 当用户提到“发布公众号”、“post to wechat”、“微信公众号”或“贴图 / 图文 / 文章”时使用。 |
-| `baoyu-post-to-weibo` | 将内容发布到微博。支持发布包含文本、图片和视频的普通微博，以及通过 Chrome CDP 使用 Markdown 输入发布微博头条文章。用户在提出“post to Weibo”“发微博”“发布微博”“publish to Weibo”“share on Weibo”“写微博”或“微博头条文章”等请求时，可使用此功能。 |
-| `baoyu-post-to-x` | 将内容和文章发布到 X（Twitter）。支持带图片/视频的普通帖子，以及 X Articles（长篇 Markdown 文章）。使用带有 CDP 的真实 Chrome 浏览器以绕过反自动化检测。当用户要求“发布到 X”“发推”“发布到 Twitter”或“分享到 X”时使用。 |
-| `baoyu-slide-deck` | 从内容生成专业的幻灯片演示文稿图片。先创建带有样式说明的大纲，然后生成单独的幻灯片图片。适用于用户提出“创建幻灯片”、“制作演示文稿”、“生成幻灯片文稿”、“幻灯片组”或“PPT”等请求时。 |
-| `baoyu-translate` | 在语言之间翻译文章和文档，提供三种模式：快速（直接翻译）、普通（先分析再翻译）和精修（分析、翻译、审校、润色）。支持通过 EXTEND.md 使用自定义术语表并保持术语一致性。适用于用户提出“translate”“翻译”“精翻”“translate article”“translate to Chinese/English”“改成中文”“改成英文”“convert to Chinese”“localize”“本地化”等请求，或任何文档翻译需求。也会在以下情况下触发：“refined translation”“精细翻译”“proofread translation”“快速翻译”“快翻”“这篇文章翻译一下”，或者当用户提供了 URL 或文件并表达了翻译意图时。 |
-| `baoyu-url-to-markdown` | 抓取任意 URL，并使用 Chrome CDP 将其转换为 Markdown。它会在保存 Markdown 的同时保存已渲染的 HTML 快照，采用升级版的 Defuddle 处理流程，以更好地处理 Web Components，并支持提取 YouTube 字幕；在需要时，还会自动回退到 Defuddle 之前的 HTML 转 Markdown 流程。如果本地浏览器抓取完全失败，它还可以回退到托管的 defuddle.md API。支持两种模式：页面加载时自动抓取，或等待用户发出信号后再抓取（适用于需要登录的页面）。当用户希望将网页保存为 Markdown 时，可使用此功能。 |
-| `baoyu-xhs-images` | 生成适用于小红书（Little Red Book）的信息图系列，提供 11 种视觉风格和 8 种版式。可将内容拆分为 1–10 张卡通风格图片，并针对小红书平台的互动效果进行优化。当用户提到“小红书图片”、“XHS images”、“RedNote infographics”、“小红书种草”，或希望为中国社交平台制作信息图时，可使用此功能。 |
-| `baoyu-youtube-transcript` | 按 URL 或视频 ID 下载 YouTube 视频的文字稿/字幕和封面图片。支持多语言、翻译、章节划分和说话人识别。缓存原始数据以便快速重新格式化。当用户提出“获取 YouTube 文字稿”“下载字幕”“获取字幕”“YouTube字幕”“YouTube封面”“视频封面”“video thumbnail”“video cover image”等需求，或提供 YouTube 链接并希望提取文字稿/字幕文本或封面图片时，可使用此功能。 |
-| `release-skills` | 通用发布工作流。自动检测版本文件和更新日志。支持 Node.js、Python、Rust、Claude 插件以及通用项目。当用户说“release”、“发布”、“new version”、“bump version”、“push”、“推送”时使用。 |
+| `baoyu-article-illustrator` | 分析文章结构，识别需要视觉辅助的位置，并采用“类型 × 风格”的二维方法生成插图。适用于用户要求“为文章配图”“添加图片”或“为文章生成图片”等场景。 |
+| `baoyu-comic` | Knowledge comic creator supporting multiple art styles and tones. Creates original educational comics with detailed panel layouts and sequential image generation. Use when user asks to create "知识漫画", "教育漫画", "biography comic", "tutorial comic", or "Logicomix-style comic". |
+| `baoyu-compress-image` | Compresses images to WebP (default) or PNG with automatic tool selection. Use when user asks to "compress image", "optimize image", "convert to webp", or reduce image file size. |
+| `baoyu-cover-image` | Generates article cover images with 5 dimensions (type, palette, rendering, text, mood) combining 10 color palettes and 7 rendering styles. Supports cinematic (2.35:1), widescreen (16:9), and square (1:1) aspects. Use when user asks to "generate cover image", "create article cover", or "make cover". |
+| `baoyu-danger-gemini-web` | 通过逆向工程的 Gemini Web API 生成图像和文本。支持文本生成、根据提示词生成图像、使用参考图像进行视觉输入以及多轮对话；当其他功能需要图像生成后端，或用户请求“用 Gemini 生成图像”“Gemini 文本生成”或需要具备视觉能力的 AI 生成时可使用。 |
+| `baoyu-danger-x-to-markdown` | Converts X (Twitter) tweets and articles to markdown with YAML front matter. Uses reverse-engineered API requiring user consent. Use when user mentions "X to markdown", "tweet to markdown", "save tweet", or provides x.com/twitter.com URLs for conversion. |
+| `baoyu-format-markdown` | 将纯文本或 Markdown 文件整理为带有 frontmatter、标题、摘要、小节标题、加粗、列表和代码块的格式。适用于用户要求“格式化 Markdown”“美化文章”“添加排版”或优化文章布局时，输出为 {filename}-formatted.md。 |
+| `baoyu-image-gen` | 使用 OpenAI、Google、OpenRouter、DashScope、即梦、Seedream 和 Replicate 的 API 进行 AI 图像生成。支持文生图、参考图、宽高比以及从已保存的提示词文件批量生成；默认顺序生成，当用户已有多个提示词或需要稳定的多图吞吐时使用并行批量生成，适用于用户要求生成、创建或绘制图像的场景。 |
+| `baoyu-infographic` | Generates professional infographics with 21 layout types and 20 visual styles. Analyzes content, recommends layout×style combinations, and generates publication-ready infographics. Use when user asks to create "infographic", "信息图", "visual summary", "可视化", or "高密度信息大图". |
+| `baoyu-markdown-to-html` | Converts Markdown to styled HTML with WeChat-compatible themes. Supports code highlighting, math, PlantUML, footnotes, alerts, infographics, and optional bottom citations for external links. Use when user asks for "markdown to html", "convert md to html", "md 转 html", "微信外链转底部引用", or needs styled HTML output from markdown. |
+| `baoyu-post-to-wechat` | Posts content to WeChat Official Account (微信公众号) via API or Chrome CDP. Supports article posting (文章) with HTML, markdown, or plain text input, and image-text posting (贴图, formerly 图文) with multiple images. Markdown article workflows default to converting ordinary external links into bottom citations for WeChat-friendly output. Use when user mentions "发布公众号", "post to wechat", "微信公众号", or "贴图/图文/文章". |
+| `baoyu-post-to-weibo` | 将内容发布到微博。支持发布包含文本、图片和视频的普通微博，以及通过 Chrome CDP 以 Markdown 输入发布微博头条文章；当用户提出“post to Weibo”“发微博”“发布微博”“publish to Weibo”“share on Weibo”“写微博”或“微博头条文章”等需求时使用。 |
+| `baoyu-post-to-x` | Posts content and articles to X (Twitter). Supports regular posts with images/videos and X Articles (long-form Markdown). Uses real Chrome with CDP to bypass anti-automation. Use when user asks to "post to X", "tweet", "publish to Twitter", or "share on X". |
+| `baoyu-slide-deck` | 根据内容生成专业的幻灯片演示图片。它会先创建带有样式说明的大纲，再生成单独的幻灯片图片；当用户要求“创建幻灯片”“制作演示文稿”“生成幻灯片集”“slide deck”或“PPT”时可使用。 |
+| `baoyu-translate` | Translates articles and documents between languages with three modes - quick (direct), normal (analyze then translate), and refined (analyze, translate, review, polish). Supports custom glossaries and terminology consistency via EXTEND.md. Use when user asks to "translate", "翻译", "精翻", "translate article", "translate to Chinese/English", "改成中文", "改成英文", "convert to Chinese", "localize", "本地化", or needs any document translation. Also triggers for "refined translation", "精细翻译", "proofread translation", "快速翻译", "快翻", "这篇文章翻译一下", or when a URL or file is provided with translation intent. |
+| `baoyu-url-to-markdown` | 使用 Chrome CDP 抓取任意 URL 并转换为 Markdown，同时保存渲染后的 HTML 快照；采用升级版 Defuddle 流水线，改进了 Web 组件处理和 YouTube 字幕提取，并在需要时自动回退到 Defuddle 之前的 HTML 转 Markdown 流水线。若本地浏览器捕获完全失败，还可回退到托管的 defuddle.md API；支持页面加载时自动捕获或等待用户信号（适用于需要登录的页面）两种模式，适合在用户想将网页保存为 Markdown 时使用。 |
+| `baoyu-xhs-images` | 生成适用于小红书（Little Red Book）的信息图系列，提供 11 种视觉风格和 8 种版式。可将内容拆分为 1-10 张适合小红书互动传播的卡通风格图片，适用于用户提到“小红书图片”“XHS images”“RedNote infographics”“小红书种草”或需要面向中国平台的社交媒体信息图时。 |
+| `baoyu-youtube-transcript` | Downloads YouTube video transcripts/subtitles and cover images by URL or video ID. Supports multiple languages, translation, chapters, and speaker identification. Caches raw data for fast re-formatting. Use when user asks to "get YouTube transcript", "download subtitles", "get captions", "YouTube字幕", "YouTube封面", "视频封面", "video thumbnail", "video cover image", or provides a YouTube URL and wants the transcript/subtitle text or cover image extracted. |
+| `release-skills` | 通用发布工作流。可自动检测版本文件和更新日志，支持 Node.js、Python、Rust、Claude 插件及通用项目。 |
 
 ## Submodule Sources / Source Repos
 - 暂无 submodule source。
