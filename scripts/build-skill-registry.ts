@@ -191,8 +191,10 @@ async function translateOne(
       }),
     })
 
-    if (!response.ok)
+    if (!response.ok) {
+      console.warn(`  ⚠ 翻译失败 [${response.status}]: ${description.slice(0, 40)}...`)
       return null
+    }
 
     const data = await response.json() as {
       choices?: { message?: { content?: string } }[]
@@ -235,19 +237,6 @@ export async function translateVendorDescriptions(
   return merged
 }
 
-function shouldTranslateText(text: string): boolean {
-  const englishSegments = text.match(/[a-z][a-z0-9+.-]*/gi)?.length ?? 0
-  const chineseChars = text.match(/[\u3400-\u9FFF]/g)?.length ?? 0
-
-  if (!englishSegments)
-    return false
-
-  if (!chineseChars)
-    return true
-
-  // 中文占主导时保留原文，避免把夹少量技术术语的中文说明再次送去翻译。
-  return englishSegments * 2 > chineseChars
-}
 
 function sanitizeTranslatedText(original: string, translated?: string): string | null {
   const normalized = translated?.trim().replace(/\n+/g, ' ') || ''
@@ -276,9 +265,6 @@ function sanitizeTranslatedText(original: string, translated?: string): string |
   if (!translatedHasChinese && originalHasChinese)
     return null
 
-  if (!translatedHasChinese && !originalHasChinese)
-    return null
-
   return normalized
 }
 
@@ -289,10 +275,10 @@ export async function translateManualSkillTexts(
   const tasks: Array<{ key: string, text: string }> = []
 
   for (const skill of manualSkills) {
-    if (shouldTranslateText(skill.title))
+    if (skill.title)
       tasks.push({ key: `${skill.name}:title`, text: skill.title })
 
-    if (shouldTranslateText(skill.description))
+    if (skill.description)
       tasks.push({ key: `${skill.name}:description`, text: skill.description })
   }
 
