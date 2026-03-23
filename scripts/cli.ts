@@ -262,6 +262,22 @@ function assertAvailableName(name: string, mode: SkillImportMode): void {
     throw new Error(`名称冲突：sources/${name} 已存在。`)
 }
 
+function importSingleManualSkill(localPath: string): void {
+  const skillName = getSkillNameFromDirectory(localPath)
+  assertAvailableName(skillName, 'manual')
+
+  ensureDir(join(root, 'skills'))
+  copyDirectory(localPath, join(root, 'skills', skillName))
+
+  writeMetaFile(
+    { ...submodules },
+    Object.fromEntries(Object.entries(vendors).map(([name, config]) => [name, { ...config, skills: { ...config.skills } }])),
+    [...manual, skillName],
+  )
+
+  console.log(`已导入技能：${skillName} -> skills/${skillName}`)
+}
+
 function importManualSkill(source: string): void {
   const githubRepo = parseGitHubRepo(source)
   let cleanupPath = ''
@@ -274,22 +290,25 @@ function importManualSkill(source: string): void {
     }
 
     const localPath = githubRepo ? sourcePath : resolveLocalDirectory(sourcePath)
-    if (!hasSkillFile(localPath))
-      throw new Error('默认模式仅支持包含 SKILL.md 的单技能目录。')
 
-    const skillName = getSkillNameFromDirectory(localPath)
-    assertAvailableName(skillName, 'manual')
+    // 目录本身包含 SKILL.md，直接导入单个技能
+    if (hasSkillFile(localPath)) {
+      importSingleManualSkill(localPath)
+      return
+    }
 
-    ensureDir(join(root, 'skills'))
-    copyDirectory(localPath, join(root, 'skills', skillName))
+    // 扫描子目录中的技能
+    const subDirs = readdirSync(localPath, { withFileTypes: true })
+      .filter(d => d.isDirectory() && hasSkillFile(join(localPath, d.name)))
+      .map(d => join(localPath, d.name))
 
-    writeMetaFile(
-      { ...submodules },
-      Object.fromEntries(Object.entries(vendors).map(([name, config]) => [name, { ...config, skills: { ...config.skills } }])),
-      [...manual, skillName],
-    )
+    if (subDirs.length === 0)
+      throw new Error('目录中未找到包含 SKILL.md 的技能目录。')
 
-    console.log(`已导入技能：${skillName} -> skills/${skillName}`)
+    for (const dir of subDirs)
+      importSingleManualSkill(dir)
+
+    console.log(`共导入 ${subDirs.length} 个技能。`)
   }
   finally {
     if (cleanupPath)
