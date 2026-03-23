@@ -13,12 +13,12 @@ export const submodules: Record<string, string> = {}
  * 外部技能来源：直接同步已有 skills
  */
 export const vendors: Record<string, VendorSkillMeta> = {
-  antfu: {
+  'antfu': {
     official: true,
     source: 'https://github.com/antfu/skills',
     skills: {},
   },
-  baoyu: {
+  'baoyu': {
     source: 'https://github.com/JimLiu/baoyu-skills',
     skills: {},
   },
@@ -28,6 +28,7 @@ export const vendors: Record<string, VendorSkillMeta> = {
  * 本仓库手写技能
  */
 export const manual = [
+  'cli-design-framework',
   'code-review-expert',
   'create-readme',
   'diagram-gen',

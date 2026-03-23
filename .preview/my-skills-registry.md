@@ -3,8 +3,8 @@
 ## Overview
 - 仓库手写技能索引
 - 安装方式：`pnpx skills add snailuu/skill --skill <name>`
-- 最后更新时间：2026-03-20 20:00:27 UTC
-- Manual skills：17
+- 最后更新时间：2026-03-23 00:44:18 UTC
+- Manual skills：18
 
 ## Manual Skills
 ### Git
@@ -67,15 +67,15 @@
 ### Workflow
 
 #### ui-high-end-visual
-- 标题：智能体技能：首席 UI/UX 架构师兼动态效果编排师（Awwwards 级别）
-- 使用场景：教 AI 像高端设计公司一样进行设计。明确规定字体、间距、阴影、卡片结构和动画等细节，从而让网站呈现出高级、昂贵的质感。同时避免那些常见的默认设置，因为这些设置往往会让 AI 的设计看起来廉价或缺乏特色。
+- 标题：代理技能：首席 UI/UX 架构师兼动态编排师（Awwwards 级别）
+- 使用场景：教会 AI 像高端设计机构一样进行设计。精确定义字体、间距、阴影、卡片结构和动画等细节，让网站呈现出高级、昂贵的质感。同时避免所有那些会让 AI 设计显得廉价或千篇一律的常见默认样式。
 - 路径：`skills/ui-high-end-visual`
 - 标签：`workflow`
 - 参考资料：无
 
 #### ui-stitch-taste
 - 标题：Stitch Design Taste — Semantic Design System Skill
-- 使用场景：用于 Google Stitch 的语义化设计系统技能。可生成对智能体友好的 DESIGN.md 文件，以强制执行高端、避免千篇一律的 UI 标准——严格的排版、精心校准的色彩、不对称布局、持续的微动效，以及硬件加速的性能表现。
+- 使用场景：用于 Google Stitch 的语义化设计系统技能。可生成适合代理使用的 DESIGN.md 文件，强制执行高端、反模板化的 UI 标准——严格的字体排印、经过校准的色彩、不对称布局、持续的微交互动效，以及硬件加速性能。
 - 路径：`skills/ui-stitch-taste`
 - 标签：`workflow`
 - 参考资料：无
@@ -90,6 +90,13 @@
 - 参考资料：有 `references/`
 
 ### Utility
+
+#### cli-design-framework
+- 标题：CLI Design Framework
+- 使用场景：在设计新的 CLI、审查现有 CLI，或在 CLI 的角色、用户类型、交互形式、有状态性、风险特征以及面向人类还是机器的使用界面存在不确定性时使用。
+- 路径：`skills/cli-design-framework`
+- 标签：无
+- 参考资料：有 `references/`
 
 #### create-readme
 - 标题：create-readme
@@ -107,35 +114,35 @@
 
 #### ui-brutalist
 - 标题：SKILL: Industrial Brutalism & Tactical Telemetry UI
-- 使用场景：原始机械式界面，将瑞士版式印刷风格与军用终端美学融合。采用严格的网格系统、极端的字号对比、实用主义配色，以及模拟信号衰减般的做旧效果。适用于数据密集型仪表盘、作品集或编辑类网站，营造出一种“机密蓝图解密后”的视觉氛围。
+- 使用场景：原始机械感界面，将瑞士风格的印刷排版与军用终端美学融为一体。采用严格的网格系统、极端的字号对比、功能主义色彩，以及模拟信号式的老化损耗效果。非常适合用于数据密集型仪表板、作品集或编辑类网站，营造出一种如同“解密蓝图”般的视觉感受。
 - 路径：`skills/ui-brutalist`
 - 标签：无
 - 参考资料：无
 
 #### ui-design-taste
 - 标题：High-Agency Frontend Skill
-- 使用场景：高级 UI/UX 工程师。负责设计数字界面架构，以覆盖默认的大语言模型偏差。贯彻基于指标的规则、严格的组件架构、CSS 硬件加速，以及兼顾美学与工程实现的平衡式设计。
+- 使用场景：高级 UI/UX 工程师。负责构建能够覆盖默认大语言模型偏差的数字界面。强调基于指标的规则、严格的组件架构、CSS 硬件加速以及兼顾美学与工程实现的平衡式设计。
 - 路径：`skills/ui-design-taste`
 - 标签：无
 - 参考资料：无
 
 #### ui-minimalist
 - 标题：Protocol: Premium Utilitarian Minimalism UI Architect
-- 使用场景：简洁的编辑风格界面。温暖的单色调配色、富有对比的排版、扁平化的便当式网格布局、柔和的粉彩色。不要使用渐变，也不要使用厚重的阴影。
+- 使用场景：干净的编辑风格界面。温暖的单色调色板、富有对比的字体排版、扁平化的 Bento 网格、柔和的粉彩色。不要渐变，不要厚重阴影。
 - 路径：`skills/ui-minimalist`
 - 标签：无
 - 参考资料：无
 
 #### ui-output-enforcement
 - 标题：Full-Output Enforcement
-- 使用场景：覆盖默认的 LLM 截断行为。强制生成完整代码，禁止使用占位符模式，并妥善处理因令牌限制导致的内容拆分。适用于任何需要详尽、未经删节输出的任务。
+- 使用场景：覆盖默认的 LLM 截断行为。强制生成完整代码，禁止使用占位符模式，并妥善处理因令牌限制导致的分段输出。适用于任何需要详尽、未删节输出的任务。
 - 路径：`skills/ui-output-enforcement`
 - 标签：无
 - 参考资料：无
 
 #### ui-redesign
 - 标题：Redesign Skill
-- 使用场景：将现有网站和应用升级为高品质版本。审查当前设计，识别通用的 AI 设计模式，并在不影响功能的前提下应用高端设计标准。兼容任何 CSS 框架或原生 CSS。
+- 使用场景：将现有网站和应用升级为高端品质。审查当前设计，识别通用的 AI 风格模式，并在不破坏功能的前提下应用高端设计标准。兼容任何 CSS 框架或原生 CSS。
 - 路径：`skills/ui-redesign`
 - 标签：无
 - 参考资料：无
@@ -151,7 +158,7 @@
 - skills/ 目录中的技能都已登记到 manual
 
 ### README missing manual skills
-- README 手写技能列表已覆盖全部 manual skills
+- `cli-design-framework`
 
 ### README missing install examples
-- README 安装示例已覆盖全部 manual skills
+- `cli-design-framework`
