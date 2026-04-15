@@ -33,6 +33,7 @@ export const manual = [
   'create-cli',
   'create-readme',
   'diagram-gen',
+  'frontend-design',
   'git-commit-gen',
   'git-exclude',
   'plan-writer',
